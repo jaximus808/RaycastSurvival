@@ -2,6 +2,9 @@ var borderWidth = 2;
 
 var windowH = window.innerHeight*0.95;
 
+var xColors = [[255,0,0],[0,0,255],[214, 116, 211]]
+var yColors = [[180,0,0],[0,0,180],[171, 92, 168]]
+
 var windowW = windowH;
 //1009
 //922
@@ -16,10 +19,10 @@ var DR;
 var player;
 var locked = false;
 var called = false;
-var rayAmount = 220;
+var rayAmount = Math.floor(windowH/8);
 var canvOb;
-var mapX = 10;
-var mapY = 11;
+var mapX = 20;
+var mapY = 20;
 var mapS = 64;
 
 var mouseXMove = 0;
@@ -27,17 +30,26 @@ var mouseYMove = 0;
 
 //zero represents empty spaces, 1 represeants a square.
 var mapLayout = [
-    1, 1, 1, 1, 1, 1, 1, 1,1,1,
-    1, 0, 1, 0, 0, 0, 0, 0,0,1,
-    1, 0, 1, 0, 0, 0, 0, 0,0,1,
-    1, 0, 1, 0, 0, 0, 0, 0,0,1,
-    1, 0, 0, 0, 0, 1 ,1, 0,0,1,
-    1, 0, 0, 0, 0, 1, 1, 0,0,1,
-    1, 0, 0, 0, 0, 0, 0, 0,0,1,
-    1, 0, 0, 0, 1, 0, 0, 0,0,1,
-    1, 0, 0, 0, 0, 0, 0, 0,0,1,
-    1, 0, 0, 0, 0, 0, 0, 0,0,1,
-    1, 1, 1, 1, 1, 1, 1, 1,1,1
+    1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
+    1, 0, 1, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 1, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 1, 0, 0, 0, 0, 0,0,0,0, 0, 2, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 2 ,2, 0,0,0,0, 0, 3, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 2, 2, 0,0,0,0, 0, 3, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 3, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 2, 0, 0, 0,0,0,0, 0, 3, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 2, 2, 2, 2, 2, 2,2,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 3, 3, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 3, 3, 0, 0, 0, 0, 0,0,1,
+    1, 0, 2, 0, 0, 0, 0, 0,3,3,0, 3, 3, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 2 ,2, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 2, 2, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 2, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
 ]
 function setup() 
 {
@@ -73,12 +85,14 @@ function draw()
     }
     called = false;
     //drawMap2D();
-    player.render();
-    
+    //player.TwoDRender();
+    drawRays3D()
+    document.getElementById("state").innerHTML = "Status: InGame (MouseLocked)"
+    document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)},${floor(player.y/64)})`
     if(!locked) return;
     
     player.move(mouseXMove);
-    drawRays3D()
+    
     
    
 }
@@ -141,7 +155,7 @@ function drawMap2D()
 function drawRays3D()
 {
     var r,mx,my,mp,dof,rx,ry,ra,xo,yo, distT;
-    ra = player.angle - DR*110
+    ra = player.angle - DR*floor(windowW/32)
     if(ra < 0)
     {
         ra += 2*pi;
@@ -155,6 +169,8 @@ function drawRays3D()
     var xXS,xYS, yXS, yYS;
     for(r=0; r < rayAmount*2; r++)
     {
+        var colorYId = 0;
+        var colorXId = 0;
         mx,my,mp,dof,rx,ry,xo,yo = 0;
         distY = 10000000;
         distX = 10000000; 
@@ -184,18 +200,19 @@ function drawRays3D()
         }
         var hit = false; 
         //console.log("vertical")
-        while( dof < 10)
+        while( dof < 20)
         {
             mx = floor(rx/64);
             my = floor(ry / 64);
             mp = my * mapX + mx;
-            if(mp > 0 &&mp < mapX * mapY && mapLayout[mp] == 1)
+            if(mp > 0 &&mp < mapX * mapY && mapLayout[mp] > 0)
             {
+                colorYId = mapLayout[mp]-1;
                 //console.log(`(${rx},${ry})`)
                 yXS = rx; 
                 yYS = ry;
-                dof = 10;
-                ellipse(rx, ry, 5, 5);
+                dof = 20;
+                //ellipse(rx, ry, 5, 5);
                 hit = true;
                 //hit wall;
             }
@@ -244,20 +261,20 @@ function drawRays3D()
         
         hit = false;
         //console.log("horizontal")
-        while( dof < 10)
+        while( dof < 20)
         {
             mx = floor(rx/64);
             my = floor(ry / 64);
             mp = my * mapX + mx;
-            if(mp > 0 && mp < mapX * mapY && mapLayout[mp] == 1)
+            if(mp > 0 && mp < mapX * mapY && mapLayout[mp] > 0)
             {
+                colorXId = mapLayout[mp]-1;
                 hit = true;
                 xXS = rx; 
                 xYS = ry;
-                fill(color("red"));
                 //console.log(`(${rx},${ry}`)
-                ellipse(xXS, xYS, 5, 5);
-                dof = 10;
+                //ellipse(xXS, xYS, 5, 5);
+                dof = 20;
                 //hit wall;
             }
             
@@ -276,22 +293,23 @@ function drawRays3D()
         {
             distX = dist(player.x, player.y, xXS, xYS);
         }
-
+        //render horizontal side 
         if(distX < distY)
         {
             //line(player.x, player.y, xXS, xYS)
             //console.log(`ray ${r} has pos of: ${xXS}, ${xYS}`)
-            fill(color(255,0,0));
+            fill(color(xColors[colorXId][0],xColors[colorXId][1],xColors[colorXId][2]));
             distT = distX;
         }
+        //render vertical
         else if(distX>distY)
         {
-            fill(color(180,0,0));
+            fill(color(yColors[colorYId][0],yColors[colorYId][1],yColors[colorYId][2]));
             //line(player.x, player.y, yXS, yYS)
             //console.log(`ray ${r} has pos of: ${yXS}, ${yYS}`)
             distT = distY;
         }
-        else if(distX == distY&& distY == 10000000)
+        else if(distX == distY&& (distY == 10000000||distY ==10000000))
         {
             fill(color("white"))
         }
@@ -308,11 +326,12 @@ function drawRays3D()
         var lineO = lineH/2;
         //maybe make ymouse movement by changing yoffset 
         noStroke()
-        rect(floor((r*8)-(windowW)), windowH/2-lineO, 8,lineH)
-        stroke(5)
+        rect(floor((r*8)), windowH/2-lineO, 8,lineH)
+        
         ra += DR/2; 
         if(ra < 0) {ra += 2*pi;} if(ra > 2*pi){ra -= 2*pi;}
         
         
     }
+    stroke(5)
 }
