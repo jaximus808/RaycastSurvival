@@ -200,7 +200,7 @@ function drawRays3D()
         }
         var hit = false; 
         //console.log("vertical")
-        while( dof < 20)
+        while( dof < mapX)
         {
             mx = floor(rx/64);
             my = floor(ry / 64);
@@ -211,7 +211,7 @@ function drawRays3D()
                 //console.log(`(${rx},${ry})`)
                 yXS = rx; 
                 yYS = ry;
-                dof = 20;
+                dof = mapX;
                 //ellipse(rx, ry, 5, 5);
                 hit = true;
                 //hit wall;
@@ -261,7 +261,7 @@ function drawRays3D()
         
         hit = false;
         //console.log("horizontal")
-        while( dof < 20)
+        while( dof < mapY)
         {
             mx = floor(rx/64);
             my = floor(ry / 64);
@@ -274,7 +274,7 @@ function drawRays3D()
                 xYS = ry;
                 //console.log(`(${rx},${ry}`)
                 //ellipse(xXS, xYS, 5, 5);
-                dof = 20;
+                dof = mapY;
                 //hit wall;
             }
             
