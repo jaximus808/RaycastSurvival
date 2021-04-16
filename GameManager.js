@@ -1,10 +1,14 @@
 var borderWidth = 2;
 
-var windowW = window.innerWidth;
-var windowH = window.innerHeight + 150;
+var windowH = window.innerHeight*0.95;
 
-var GameScreenX = 1080;
-var GameScreenY = 640;
+var windowW = windowH;
+//1009
+//922
+console.log(windowW)
+console.log(windowH)
+// var GameScreenX = 1080;
+// var GameScreenY = 640;
 
 var pi;
 var DR;
@@ -12,10 +16,10 @@ var DR;
 var player;
 var locked = false;
 var called = false;
-var rayAmount = 60;
+var rayAmount = 220;
 var canvOb;
 var mapX = 10;
-var mapY = 10;
+var mapY = 11;
 var mapS = 64;
 
 var mouseXMove = 0;
@@ -32,6 +36,7 @@ var mapLayout = [
     1, 0, 0, 0, 0, 0, 0, 0,0,1,
     1, 0, 0, 0, 1, 0, 0, 0,0,1,
     1, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,1,
     1, 1, 1, 1, 1, 1, 1, 1,1,1
 ]
 function setup() 
@@ -41,7 +46,7 @@ function setup()
     DR = 0.0174533
     angleMode(RADIANS);
     player = new Player(96,96, 5, 1,90*pi/180,pi,0.01)
-    createCanvas(GameScreenX, GameScreenY);
+    createCanvas(windowW, windowH);
     canvOb = document.getElementById("defaultCanvas0")
     canvOb.addEventListener("mousemove", e =>
     {
@@ -67,11 +72,12 @@ function draw()
         mouseXMove = 0;
     }
     called = false;
-    drawMap2D();
+    //drawMap2D();
     player.render();
     
-    player.move(mouseXMove);
     if(!locked) return;
+    
+    player.move(mouseXMove);
     drawRays3D()
     
    
@@ -99,6 +105,11 @@ function keyPressed()
     if(keyCode ==49 )
     {
         ToggleLockMouse()
+    }
+    if(keyCode == 27)
+    {
+        document.getElementById("state").innerHTML = "Status: Paused (MouseUnlocked)"
+        locked = false;;
     }
 }
 
@@ -130,7 +141,7 @@ function drawMap2D()
 function drawRays3D()
 {
     var r,mx,my,mp,dof,rx,ry,ra,xo,yo, distT;
-    ra = player.angle - DR*30
+    ra = player.angle - DR*110
     if(ra < 0)
     {
         ra += 2*pi;
@@ -142,8 +153,7 @@ function drawRays3D()
     var distY = 10000000;
     var distX = 10000000; 
     var xXS,xYS, yXS, yYS;
-    var p = player.angle - DR*30;
-    for(r=0; r < rayAmount; r++)
+    for(r=0; r < rayAmount*2; r++)
     {
         mx,my,mp,dof,rx,ry,xo,yo = 0;
         distY = 10000000;
@@ -170,12 +180,11 @@ function drawRays3D()
         {
             rx = player.x;
             ry = player.y;
-            dof = 8; 
+            dof = 10; 
         }
-        fill(color("yellow"));
         var hit = false; 
         //console.log("vertical")
-        while( dof < 8)
+        while( dof < 10)
         {
             mx = floor(rx/64);
             my = floor(ry / 64);
@@ -185,7 +194,7 @@ function drawRays3D()
                 //console.log(`(${rx},${ry})`)
                 yXS = rx; 
                 yYS = ry;
-                dof = 8;
+                dof = 10;
                 ellipse(rx, ry, 5, 5);
                 hit = true;
                 //hit wall;
@@ -230,12 +239,12 @@ function drawRays3D()
         {
             ry = player.y;
             rx = player.x;
-            dof = 8; 
+            dof = 10; 
         }
         
         hit = false;
         //console.log("horizontal")
-        while( dof < 8)
+        while( dof < 10)
         {
             mx = floor(rx/64);
             my = floor(ry / 64);
@@ -248,7 +257,7 @@ function drawRays3D()
                 fill(color("red"));
                 //console.log(`(${rx},${ry}`)
                 ellipse(xXS, xYS, 5, 5);
-                dof = 8;
+                dof = 10;
                 //hit wall;
             }
             
@@ -270,26 +279,40 @@ function drawRays3D()
 
         if(distX < distY)
         {
-            line(player.x, player.y, xXS, xYS)
+            //line(player.x, player.y, xXS, xYS)
             //console.log(`ray ${r} has pos of: ${xXS}, ${xYS}`)
+            fill(color(255,0,0));
             distT = distX;
         }
         else if(distX>distY)
         {
-            line(player.x, player.y, yXS, yYS)
+            fill(color(180,0,0));
+            //line(player.x, player.y, yXS, yYS)
             //console.log(`ray ${r} has pos of: ${yXS}, ${yYS}`)
             distT = distY;
         }
-        else 
+        else if(distX == distY&& distY == 10000000)
         {
-            line(player.x, player.y, yXS, yYS)
+            fill(color("white"))
         }
         //Drawing 3D scene 
-        
-        ra += DR; 
-        
+        var ca = player.angle-ra;
+        if(ca< 0) { ca += 2*pi;}
+        if(ca>2*pi) {ca -= 2*pi;}
+        distT *=  cos(ca)
+        var lineH = (mapS*windowW)/distT;
+        if(lineH>windowW)
+        {
+            lineH = windowW;
+        }
+        var lineO = lineH/2;
+        //maybe make ymouse movement by changing yoffset 
+        noStroke()
+        rect(floor((r*8)-(windowW)), windowH/2-lineO, 8,lineH)
+        stroke(5)
+        ra += DR/2; 
         if(ra < 0) {ra += 2*pi;} if(ra > 2*pi){ra -= 2*pi;}
         
-        p = ra;
+        
     }
 }
