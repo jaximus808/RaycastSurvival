@@ -12,7 +12,7 @@ class Player {
         this.rotSpeed = rotSpeed;
     }
 
-    render() {
+    TwoDRender() {
         fill(color("yellow"));
         ellipse(this.x, this.y, this.radius, this.radius);
         fill(color("gray"));
@@ -28,8 +28,13 @@ class Player {
             }
             let dx = cos(ang)*5;
             let dy = sin(ang)*5;
-            this.x += dx *this.speed;
-            this.y += dy * this.speed;
+            let pX = this.x + dx *this.speed;
+            let pY = this.y + dy * this.speed;
+            if(mapLayout[floor(pX/64)+floor(pY/64)*mapX] ==0) 
+            {
+                this.x = pX;
+                this.y = pY ;  
+            }
         }
 
         if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
@@ -40,18 +45,33 @@ class Player {
             }
             let dx = cos(ang)*5;
             let dy = sin(ang)*5;
-            this.x += dx *this.speed;
-            this.y += dy * this.speed;
+            let pX = this.x + dx *this.speed;
+            let pY = this.y + dy * this.speed;
+            if(mapLayout[floor(pX/64)+floor(pY/64)*mapX] ==0) 
+            {
+                this.x = pX;
+                this.y = pY ;  
+            }
         }
 
         if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
-            this.x += this.dx * this.speed ; 
-            this.y += this.dy* this.speed; 
+            let pX = this.x +this.dx * this.speed ; 
+            let pY = this.y + this.dy* this.speed; 
+            if(mapLayout[floor(pX/64)+floor(pY/64)*mapX] ==0) 
+            {
+                this.x = pX;
+                this.y = pY ;  
+            }
         }
 
         if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) {
-            this.x -= this.dx* this.speed; 
-            this.y -= this.dy* this.speed; 
+            let pX = this.x -this.dx * this.speed ; 
+            let pY = this.y - this.dy* this.speed; 
+            if(mapLayout[floor(pX/64)+floor(pY/64)*mapX] ==0) 
+            {
+                this.x = pX;
+                this.y = pY ;  
+            }
         }
 
         if(mouseXMove > 0)

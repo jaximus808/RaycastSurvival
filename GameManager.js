@@ -5,7 +5,10 @@ var windowH = window.innerHeight*0.95;
 var xColors = [[255,0,0],[0,0,255],[214, 116, 211]]
 var yColors = [[180,0,0],[0,0,180],[171, 92, 168]]
 
+
+
 var windowW = windowH;
+var FOVAng = Math.floor(windowW/32);
 //1009
 //922
 console.log(windowW)
@@ -17,6 +20,7 @@ var pi;
 var DR;
 
 var player;
+var enemy;
 var locked = false;
 var called = false;
 var rayAmount = Math.floor(windowH/8);
@@ -25,15 +29,17 @@ var mapX = 20;
 var mapY = 20;
 var mapS = 64;
 
+var enemy1 = [];
+
 var mouseXMove = 0;
 var mouseYMove = 0; 
 
 //zero represents empty spaces, 1 represeants a square.
 var mapLayout = [
     1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
-    1, 0, 1, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
-    1, 0, 1, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
-    1, 0, 1, 0, 0, 0, 0, 0,0,0,0, 0, 2, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 2, 0, 0, 0, 0, 0,0,1,
     1, 0, 0, 0, 0, 2 ,2, 0,0,0,0, 0, 3, 0, 0, 0, 0, 0,0,1,
     1, 0, 0, 0, 0, 2, 2, 0,0,0,0, 0, 3, 0, 0, 0, 0, 0,0,1,
     1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 3, 0, 0, 0, 0, 0,0,1,
@@ -51,14 +57,21 @@ var mapLayout = [
     1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
     1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
 ]
+function preload()
+{
+    enemy1[0] = loadImage("./Assets/TestEnemySprite.png")
+}
+
 function setup() 
 {
-   
+    
     pi = PI;
     DR = 0.0174533
     angleMode(RADIANS);
-    player = new Player(96,96, 5, 1,90*pi/180,pi,0.01)
-    createCanvas(windowW, windowH);
+    
+    player = new Player(161,300, 5, 1,90*pi/180,pi,0.01)
+    enemy = new Enemy(161,300,enemy1,player,FOVAng);
+    createCanvas(windowW, windowH,enemy1);
     canvOb = document.getElementById("defaultCanvas0")
     canvOb.addEventListener("mousemove", e =>
     {
@@ -88,7 +101,8 @@ function draw()
     //player.TwoDRender();
     drawRays3D()
     document.getElementById("state").innerHTML = "Status: InGame (MouseLocked)"
-    document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)},${floor(player.y/64)})`
+    document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)+1},${floor(player.y/64)+1})`
+    enemy.Render()
     if(!locked) return;
     
     player.move(mouseXMove);
@@ -155,7 +169,7 @@ function drawMap2D()
 function drawRays3D()
 {
     var r,mx,my,mp,dof,rx,ry,ra,xo,yo, distT;
-    ra = player.angle - DR*floor(windowW/32)
+    ra = player.angle - DR*FOVAng
     if(ra < 0)
     {
         ra += 2*pi;
@@ -326,6 +340,22 @@ function drawRays3D()
         var lineO = lineH/2;
         //maybe make ymouse movement by changing yoffset 
         noStroke()
+
+        //p5 image for textures?
+
+        // //draw each wall pixel by pixel for textures
+        // for(let y =0; y < lineH; y++)
+        // {
+        //     beginShape();
+        //     vertex(floor((r*8),windowH/2-lineO))
+        //     vertex(floor((r*8),windowH/2-lineO+y))
+        //     vertex(floor((r*8)+8,windowH/2-lineO+y))
+        //     vertex(floor((r*8)+8,windowH/2-lineO))
+        //     endShape()
+        //     //rect(floor((r*8)), windowH/2-lineO, 8,y+lineO)
+        // }
+
+
         rect(floor((r*8)), windowH/2-lineO, 8,lineH)
         
         ra += DR/2; 

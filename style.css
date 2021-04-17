@@ -13,3 +13,10 @@ body
     transform: translate(-50%,-50%);
     border: 6px solid black;
 }
+#coords
+{
+    
+    position: absolute;
+    top:0px;
+    right: 10;
+}
