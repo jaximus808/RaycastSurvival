@@ -4,6 +4,7 @@ var windowH = window.innerHeight*0.95;
 
 var xColors = [[255,0,0],[0,0,255],[214, 116, 211]]
 var yColors = [[180,0,0],[0,0,180],[171, 92, 168]]
+var spriteColors = [[53, 242, 60],[0, 0, 0],[120, 8, 8]]
 
 
 
@@ -34,6 +35,8 @@ var enemy1 = [];
 var mouseXMove = 0;
 var mouseYMove = 0; 
 
+var zDepthBuffer = [];
+
 //zero represents empty spaces, 1 represeants a square.
 var mapLayout = [
     1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
@@ -57,6 +60,42 @@ var mapLayout = [
     1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
     1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
 ]
+
+var enemySprite1 = 
+[
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+]
 function preload()
 {
     enemy1[0] = loadImage("./Assets/TestEnemySprite.png")
@@ -69,8 +108,8 @@ function setup()
     DR = 0.0174533
     angleMode(RADIANS);
     
-    player = new Player(161,300, 5, 1,90*pi/180,pi,0.01)
-    enemy = new Enemy(161,300,enemy1,player,FOVAng);
+    player = new Player(161,300, 2, 1,90*pi/180,pi,0.01)
+    enemy = new Enemy(161,300,enemy1,FOVAng , enemySprite1);
     createCanvas(windowW, windowH,enemy1);
     canvOb = document.getElementById("defaultCanvas0")
     canvOb.addEventListener("mousemove", e =>
@@ -102,7 +141,7 @@ function draw()
     drawRays3D()
     document.getElementById("state").innerHTML = "Status: InGame (MouseLocked)"
     document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)+1},${floor(player.y/64)+1})`
-    enemy.Render()
+    enemy.Render(zDepthBuffer)
     if(!locked) return;
     
     player.move(mouseXMove);
@@ -323,10 +362,7 @@ function drawRays3D()
             //console.log(`ray ${r} has pos of: ${yXS}, ${yYS}`)
             distT = distY;
         }
-        else if(distX == distY&& (distY == 10000000||distY ==10000000))
-        {
-            fill(color("white"))
-        }
+        zDepthBuffer[r] = distT;
         //Drawing 3D scene 
         var ca = player.angle-ra;
         if(ca< 0) { ca += 2*pi;}
