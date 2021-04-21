@@ -20,6 +20,12 @@ class Player {
     }
     move(mouseXMove) 
     {
+        var shift = false;
+        if(keyIsDown(16))
+        {
+            this.speed *= 2;
+            shift = true;
+        }
         if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
             let ang = this.angle + (pi/2);
             if(ang>this.tPi)
@@ -95,6 +101,10 @@ class Player {
             }
             this.dx = cos(this.angle)*5;
             this.dy = sin(this.angle)*5;
+        }
+        if(shift)
+        {
+            this.speed /= 2;
         }
 
     }

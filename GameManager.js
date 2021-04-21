@@ -61,41 +61,7 @@ var mapLayout = [
     1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
 ]
 
-var enemySprite1 = 
-[
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-]
+
 function preload()
 {
     enemy1[0] = loadImage("./Assets/TestEnemySprite.png")
@@ -109,7 +75,7 @@ function setup()
     angleMode(RADIANS);
     
     player = new Player(161,300, 2, 1,90*pi/180,pi,0.01)
-    enemy = new Enemy(161,300,enemy1,FOVAng , enemySprite1);
+    enemy = new Enemy(813,615,enemy1,FOVAng ,2);
     createCanvas(windowW, windowH,enemy1);
     canvOb = document.getElementById("defaultCanvas0")
     canvOb.addEventListener("mousemove", e =>
@@ -141,7 +107,7 @@ function draw()
     drawRays3D()
     document.getElementById("state").innerHTML = "Status: InGame (MouseLocked)"
     document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)+1},${floor(player.y/64)+1})`
-    enemy.Render(zDepthBuffer)
+    enemy.Render()
     if(!locked) return;
     
     player.move(mouseXMove);
@@ -376,7 +342,7 @@ function drawRays3D()
         var lineO = lineH/2;
         //maybe make ymouse movement by changing yoffset 
         noStroke()
-
+        
         //p5 image for textures?
 
         // //draw each wall pixel by pixel for textures
@@ -391,7 +357,7 @@ function drawRays3D()
         //     //rect(floor((r*8)), windowH/2-lineO, 8,y+lineO)
         // }
 
-
+        //text(r,(r*8), windowH/2-lineO-random(0,50))
         rect(floor((r*8)), windowH/2-lineO, 8,lineH)
         
         ra += DR/2; 
@@ -400,4 +366,5 @@ function drawRays3D()
         
     }
     stroke(5)
+    
 }
