@@ -75,7 +75,7 @@ function setup()
     angleMode(RADIANS);
     
     player = new Player(161,300, 2, 1,90*pi/180,pi,0.01)
-    enemy = new Enemy(813,615,enemy1,FOVAng ,2);
+    enemy = new Enemy(813,615,enemy1,FOVAng ,2,20,1,1,10);
     createCanvas(windowW, windowH,enemy1);
     canvOb = document.getElementById("defaultCanvas0")
     canvOb.addEventListener("mousemove", e =>
@@ -102,12 +102,14 @@ function draw()
         mouseXMove = 0;
     }
     called = false;
-    //drawMap2D();
+    
     //player.TwoDRender();
     drawRays3D()
     document.getElementById("state").innerHTML = "Status: InGame (MouseLocked)"
     document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)+1},${floor(player.y/64)+1})`
     enemy.Render()
+    enemy.Move()
+    drawMap2D();
     if(!locked) return;
     
     player.move(mouseXMove);
@@ -146,28 +148,205 @@ function keyPressed()
     }
 }
 
+function getWorldAngle2D(x1,y1,x2,y2)
+{
+    // let distX = player.x -this.x;
+    // let distY = player.y -this.y;
+
+    let distX = x1 - x2;
+    let distY = y1 - y2;
+
+    let angRelPlay =  atan2(distX, distY) +pi/2
+    if(angRelPlay >= 0)
+    {
+        angRelPlay = ((3*pi/2 - angRelPlay) + pi/2) * -1;
+    }
+    
+    angRelPlay *= -1;
+    return angRelPlay;
+}
+
 function drawMap2D()
 {
-    
+    noStroke()
     let x,y;
     for(y = 0;y<mapY;y++)
     {
         
         for(x = 0; x<mapX; x++)
         {
-            if(mapLayout[y*mapX+x] == 1 )
+            if(mapLayout[y*mapX+x] >= 1 )
             {
                 fill(color("red"));
-                rect(64*x, y*64, 64,64);
+                rect(8*x, y*8, 8,8);
             }
             else 
             {
-                fill(color("white"))
-                rect(64*x, y*64, 64,64);
+                fill(color("white"));
+                rect(8*x, y*8, 8,8);
             }
+            
         }
     }
+    
+    fill(color("black"))
+    ellipse(player.x/8,player.y/8,4,4)
+    ellipse(enemy.x/8,enemy.y/8,4,4)
+    stroke(5)
+    //console.log(enemy.dx)
+    line(enemy.x/8,enemy.y/8, (enemy.x + enemy.dx*8)/8, (enemy.y + enemy.dy*8)/8);
+    
+    
 }
+
+function ShootRay(x1,y1, angle,rayDist)
+{
+        var mx,my,mp,dof,rx,ry,xo,yo,distT = 0;
+        distY = 1000000;
+        distX = 1000000; 
+        //vertical line check
+        dof = 0;
+        let ra = angle;
+        let aTan = -1/tan(ra);
+        if(ra >pi)//looking down 
+        {
+            ry = floor(y1/64)*64- 0.0001;
+            rx = (y1 - ry) * aTan+x1;
+            yo = -64;
+            xo = -yo * aTan;
+        }
+         if(ra <pi)//looking up 
+        {
+            ry = floor(y1/64)*64 +64;
+            rx = (y1 - ry) * aTan+x1;
+            
+            yo = 64;
+            xo = -yo * aTan;
+        }
+         if(ra ==0 || ra == pi)
+        {
+            rx = x1;
+            ry = y1;
+            dof = rayDist; 
+        }
+        var hit = false; 
+        //console.log("vertical")
+        
+        while( dof < rayDist)
+        {
+            mx = floor(rx/64);
+            my = floor(ry / 64);
+            mp = my * mapX + mx;
+            if(mp > 0 &&mp < mapX * mapY && mapLayout[mp] > 0)
+            {
+                colorYId = mapLayout[mp]-1;
+                //console.log(`(${rx},${ry})`)
+                yXS = rx; 
+                yYS = ry;
+                dof = rayDist;
+                
+                hit = true;
+                //hit wall;
+            }
+            
+            else  
+            {
+                rx += xo; 
+                ry += yo;
+                dof += 1;
+            }
+            
+        }
+        if(!hit)
+        {
+            distY = 1000000;
+        }
+        else 
+        {
+            distY = dist(x1, y1, yXS, yYS);
+        }
+        
+        //horizontal line check
+        dof = 0;
+        let nTan = -tan(ra);
+
+        if(ra >pi/2 && ra < 3*pi/2)//looking left  
+        {
+            rx = floor(x1/64)*64- 0.0001;
+            ry = (x1 - rx) * nTan+y1;
+            xo = -64;
+            yo = -xo * nTan;
+        }
+        if(ra <pi/2 || ra > 3*pi/2)//looking right 
+        {
+            rx = floor(x1/64)*64 +64;
+            ry = (x1 - rx) * nTan+y1;
+            
+            xo = 64;
+            yo = -xo * nTan;
+        }
+         if(ra == pi/2 || ra == 3*pi/2)
+        {
+            ry = x1;
+            rx = y1;
+            dof = rayDist; 
+        }
+        
+        hit = false;
+        //console.log("horizontal")
+        while( dof < rayDist)
+        {
+            mx = floor(rx/64);
+            my = floor(ry / 64);
+            mp = my * mapX + mx;
+            if(mp > 0 && mp < mapX * mapY && mapLayout[mp] > 0)
+            {
+                colorXId = mapLayout[mp]-1;
+                hit = true;
+                xXS = rx; 
+                xYS = ry;
+                //console.log(`(${rx},${ry}`)
+                //ellipse(xXS, xYS, 5, 5);
+                dof = rayDist;
+                //hit wall;
+            }
+            
+            else 
+            {
+                rx += xo; 
+                ry += yo;
+                dof += 1;
+            }
+            
+        }
+        if(!hit)
+        {
+            distX = 1000000;
+        }
+        else 
+        {
+            distX = dist(x1, y1 , xXS, xYS);
+        }
+        //render horizontal side 
+        if(distX < distY)
+        {
+            //line(player.x, player.y, xXS, xYS)
+            //console.log(`ray ${r} has pos of: ${xXS}, ${xYS}`)
+            // fill(color(xColors[colorXId][0],xColors[colorXId][1],xColors[colorXId][2]));
+            distT = distX;
+        }
+        //render vertical
+        else if(distX>distY)
+        {
+            // fill(color(yColors[colorYId][0],yColors[colorYId][1],yColors[colorYId][2]));
+            //line(player.x, player.y, yXS, yYS)
+            //console.log(`ray ${r} has pos of: ${yXS}, ${yYS}`)
+            distT = distY;
+        }
+        return distT;
+}
+
+
 
 
 
@@ -183,16 +362,16 @@ function drawRays3D()
     {
         ra -= 2*pi;
     }
-    var distY = 10000000;
-    var distX = 10000000; 
+    var distY;
+    var distX;
     var xXS,xYS, yXS, yYS;
     for(r=0; r < rayAmount*2; r++)
     {
         var colorYId = 0;
         var colorXId = 0;
         mx,my,mp,dof,rx,ry,xo,yo = 0;
-        distY = 10000000;
-        distX = 10000000; 
+        distY = 1000000;
+        distX = 1000000; 
         //vertical line check
         dof = 0;
         let aTan = -1/tan(ra);
@@ -219,6 +398,7 @@ function drawRays3D()
         }
         var hit = false; 
         //console.log("vertical")
+        
         while( dof < mapX)
         {
             mx = floor(rx/64);
@@ -231,7 +411,7 @@ function drawRays3D()
                 yXS = rx; 
                 yYS = ry;
                 dof = mapX;
-                //ellipse(rx, ry, 5, 5);
+                
                 hit = true;
                 //hit wall;
             }
@@ -242,6 +422,7 @@ function drawRays3D()
                 ry += yo;
                 dof += 1;
             }
+            
         }
         if(!hit)
         {
@@ -303,6 +484,7 @@ function drawRays3D()
                 ry += yo;
                 dof += 1;
             }
+            
         }
         if(!hit)
         {
