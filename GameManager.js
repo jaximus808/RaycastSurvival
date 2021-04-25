@@ -6,7 +6,7 @@ var xColors = [[255,0,0],[0,0,255],[214, 116, 211]]
 var yColors = [[180,0,0],[0,0,180],[171, 92, 168]]
 var spriteColors = [[53, 242, 60],[0, 0, 0],[120, 8, 8]]
 
-
+var mouseClickedFrame = false; 
 
 var windowW = windowH;
 var FOVAng = Math.floor(windowW/32);
@@ -22,6 +22,7 @@ var DR;
 
 var player;
 var enemy;
+var EnemyCollection = {};
 var locked = false;
 var called = false;
 var rayAmount = Math.floor(windowH/8);
@@ -32,9 +33,14 @@ var mapS = 64;
 
 var enemy1 = [];
 
+var idleGunSprite; 
+var shootGunSprite; //pistol
+var shootAnim = 0.5; 
+
 var mouseXMove = 0;
 var mouseYMove = 0; 
-
+var playerSpriteWidth;
+var playerSpriteHeight;
 var zDepthBuffer = [];
 
 //zero represents empty spaces, 1 represeants a square.
@@ -64,7 +70,10 @@ var mapLayout = [
 
 function preload()
 {
-    enemy1[0] = loadImage("./Assets/TestEnemySprite.png")
+    playerSpriteWidth = windowW/2
+    playerSpriteHeight = windowH/2
+    idleGunSprite = loadImage("./Assets/ResizePixelGunSprite2_Idle.png")
+    shootingGunSprite = loadImage("./Assets/ResizePixelGunSprite4_Shoot.png")
 }
 
 function setup() 
@@ -74,8 +83,10 @@ function setup()
     DR = 0.0174533
     angleMode(RADIANS);
     
-    player = new Player(161,300, 2, 1,90*pi/180,pi,0.01)
-    enemy = new Enemy(813,615,enemy1,FOVAng ,2,20,1,1,10);
+    player = new Player(161,300, 2, 1,90*pi/180,pi,0.01,1.5)
+    //EnemyCollection.push(new Enemy(813,615,enemy1,FOVAng ,2,20,1,1,10));
+    AddEnemy(813,615,20,1,1,10,2)
+    AddEnemy(813,615,20,1,1,10,2)
     createCanvas(windowW, windowH,enemy1);
     canvOb = document.getElementById("defaultCanvas0")
     canvOb.addEventListener("mousemove", e =>
@@ -107,16 +118,57 @@ function draw()
     drawRays3D()
     document.getElementById("state").innerHTML = "Status: InGame (MouseLocked)"
     document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)+1},${floor(player.y/64)+1})`
-    enemy.Render()
-    enemy.Move()
-    drawMap2D();
+    // for(let enemy in EnemyCollection)
+    // {
+    //     enemy.Render();
+    // }
+    let enemiesKeys = Object.keys(EnemyCollection);
+    for(let i = 0; i < enemiesKeys.length; i++)
+    {
+        EnemyCollection[enemiesKeys[i]].Render();
+    }
+
+
+    drawMap2D(enemiesKeys);
+    if(locked && mouseClickedFrame)
+    {
+        
+        player.Shoot()
+    }
+    //player.ShootLogic();
+    mouseClickedFrame = false;
+    player.Render();
     if(!locked) return;
+    for(let i = 0; i < enemiesKeys.length; i++)
+    {
+        EnemyCollection[enemiesKeys[i]].Move();
+    }
+
+    // for(let enemy in EnemyCollection)
+    // {
+    //     enemy.Move();
+    // }
+    // for(let i = 0; i<EnemyCollection.length; i++)
+    // {
+    //     EnemyCollection[i].Move()
+    // }
     
     player.move(mouseXMove);
     
     
    
 }
+
+// function mouseClicked() {
+//     mouseClickedFrame = true;
+// }
+
+document.getElementsByTagName("body")[0].addEventListener("mousedown",(e) => 
+{
+    mouseClickedFrame = true;
+})
+
+
 
 function ToggleLockMouse()
 {
@@ -148,6 +200,28 @@ function keyPressed()
     }
 }
 
+function AddEnemy(x, y,width,speed, rotSpeed, rayDist)
+{
+    
+    if(Object.keys(EnemyCollection).length == 0 )
+    {
+        //(813,615,FOVAng ,2,20,1,1,10,0) 
+        //(x, y, FOV,colorIndex,width, speed, rotSpeed,rayDist, id)
+        EnemyCollection[0] = new Enemy(x,y,FOVAng ,2,width,speed,rotSpeed,rayDist,0)
+        return;
+    }
+    let i = 0
+    for(i; i < Object.keys(EnemyCollection).length; i++)
+    {
+        if(EnemyCollection[i] == undefined)
+        {
+            EnemyCollection[i] = new Enemy(x,y,FOVAng ,2,width,speed,rotSpeed,rayDist,0);
+            return;
+        }
+    }
+    EnemyCollection[i+1] = new Enemy(x,y,FOVAng ,2,width,speed,rotSpeed,rayDist,0)
+}
+
 function getWorldAngle2D(x1,y1,x2,y2)
 {
     // let distX = player.x -this.x;
@@ -166,7 +240,7 @@ function getWorldAngle2D(x1,y1,x2,y2)
     return angRelPlay;
 }
 
-function drawMap2D()
+function drawMap2D(enemiesKeys)
 {
     noStroke()
     let x,y;
@@ -191,11 +265,21 @@ function drawMap2D()
     
     fill(color("black"))
     ellipse(player.x/8,player.y/8,4,4)
-    ellipse(enemy.x/8,enemy.y/8,4,4)
     stroke(5)
-    //console.log(enemy.dx)
-    line(enemy.x/8,enemy.y/8, (enemy.x + enemy.dx*8)/8, (enemy.y + enemy.dy*8)/8);
+    // for(let i = 0; i < EnemyCollection.length; i++)
+    // {
+    //     ellipse(EnemyCollection[i].x/8,EnemyCollection[i].y/8,4,4)
     
+    //     //console.log(enemy.dx)
+    //     line(EnemyCollection[i].x/8,EnemyCollection[i].y/8, (EnemyCollection[i].x + EnemyCollection[i].dx*8)/8, (EnemyCollection[i].y + EnemyCollection[i].dy*8)/8);
+    // }
+    
+    for(let i = 0; i < enemiesKeys.length; i++)
+    {
+        let enemyInst = EnemyCollection[enemiesKeys[i]]
+        ellipse(enemyInst.x/8,enemyInst.y/8,4,4)
+        line(enemyInst.x/8,enemyInst.y/8, (enemyInst.x + enemyInst.dx*8)/8, (enemyInst.y + enemyInst.dy*8)/8);
+    }
     
 }
 
@@ -328,9 +412,10 @@ function ShootRay(x1,y1, angle,rayDist)
             distX = dist(x1, y1 , xXS, xYS);
         }
         //render horizontal side 
+        stroke(5)
         if(distX < distY)
         {
-            //line(player.x, player.y, xXS, xYS)
+            //line(x1/8, y1/8, enemy.x/8+ xXS/8, enemy.y/8 + xYS/8)
             //console.log(`ray ${r} has pos of: ${xXS}, ${xYS}`)
             // fill(color(xColors[colorXId][0],xColors[colorXId][1],xColors[colorXId][2]));
             distT = distX;
@@ -339,10 +424,13 @@ function ShootRay(x1,y1, angle,rayDist)
         else if(distX>distY)
         {
             // fill(color(yColors[colorYId][0],yColors[colorYId][1],yColors[colorYId][2]));
-            //line(player.x, player.y, yXS, yYS)
+            //line(x1/8, y1/8, enemy.x/8+ yXS/8, enemy.y/8+ yYS/8)
             //console.log(`ray ${r} has pos of: ${yXS}, ${yYS}`)
             distT = distY;
         }
+        noStroke()
+        //line(x1/8,y1/8)
+        
         return distT;
 }
 

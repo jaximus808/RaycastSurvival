@@ -1,5 +1,5 @@
 class Player {
-    constructor(startX, startY, r, speed,angle,pi,rotSpeed) {
+    constructor(startX, startY, r, speed,angle,pi,rotSpeed, fireRate) {
         this.x = startX;
         this.y = startY;
         this.angle = angle;
@@ -10,6 +10,11 @@ class Player {
         this.pi = pi; 
         this.tPi = 2*pi;
         this.rotSpeed = rotSpeed;
+        this.shooting = false;
+        this.shootAnim = false;
+        this.fireRate = fireRate;
+        this.curTime = 0;
+        this.shootCheckIntev = setInterval(this.ShootLogic, 500);
     }
 
     TwoDRender() {
@@ -17,7 +22,49 @@ class Player {
         ellipse(this.x, this.y, this.radius, this.radius);
         fill(color("gray"));
         line(this.x,this.y, this.x +this.dx*5,this.y +this.dy*5)
+        
     }
+
+    Render()
+    {
+        if(this.shootAnim)
+        {
+            image(shootingGunSprite, windowW-playerSpriteWidth,windowH-playerSpriteHeight,playerSpriteWidth,playerSpriteHeight)
+        }
+        else 
+        {
+            image(idleGunSprite, windowW-playerSpriteWidth,windowH-playerSpriteHeight,playerSpriteWidth,playerSpriteHeight)
+        }
+    }
+
+    ShootLogic()
+    {
+        if(!locked) return;
+        console.log(player.shooting)
+        if(!player.shooting) return; 
+        
+        if(player.curTime >= player.fireRate)
+        {
+            player.shooting = false 
+        }
+        
+        if(player.curTime >= shootAnim)
+        {
+            player.shootAnim = false;
+        }
+        player.curTime += 0.5;
+
+    }
+
+    Shoot()
+    {
+        if(this.shooting) return;
+        this.shooting = true
+        this.curTime = 0;
+        this.shootAnim = true;  
+        console.log(this.shooting)
+    }
+
     move(mouseXMove) 
     {
         var shift = false;

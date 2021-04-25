@@ -1,6 +1,6 @@
 class Enemy
 {
-    constructor(x, y,imageArray, FOV,colorIndex,width, speed, rotSpeed,rayDist)
+    constructor(x, y, FOV,colorIndex,width, speed, rotSpeed,rayDist, id, health)
     {
         this.speed = speed;
         this.x = x;
@@ -11,7 +11,7 @@ class Enemy
         //console.log(this.spriteX)
         this.spriteY = 960;
         this.colorIndex = colorIndex;
-        this.angle = getWorldAngle2D(this.x,this.y,player.x ,player.y); 
+        this.angle = getWorldAngle2D(this.x,this.y,player.x ,player.y) + (random(-30,30) * pi/180); 
         this.dx = cos(this.angle) * 5;
         this.dy = sin(this.angle) * 5; 
         //.log(this.angle)
@@ -21,6 +21,8 @@ class Enemy
         this.movingRotateToPoint = 0;
         this.currRotated = 0;
         this.rotating = false;
+        this.id = id;
+        this.health = health;
     }
 
     Render()
@@ -116,17 +118,75 @@ class Enemy
             //document.getElementById("debug").innerHTML = `(${renderXPos}`
             
         }
-        document.getElementById("debug").innerHTML = `(${player.angle*180/pi},${angRelPlay*180/pi}, ${abs((player.angle*180/pi)-(angRelPlay*180/pi))},${angRelPlay*180/pi},${renderXPos},${inFOV})`
+        
        
+    }
+    
+    ForwardMove(multiplierSpeed)
+    {
+        let pX = this.x +this.dx * (this.speed*multiplierSpeed) ; 
+        let pY = this.y + this.dy* (this.speed*multiplierSpeed) 
+        if(mapLayout[floor((pX+this.width)/64)+floor((pY+this.width)/64)*mapX] ==0 && mapLayout[floor((pX-this.width)/64)+floor((pY-this.width)/64)*mapX] ==0&&mapLayout[floor((pX-this.width)/64)+floor((pY+this.width)/64)*mapX] ==0 && mapLayout[floor((pX+this.width)/64)+floor((pY-this.width)/64)*mapX] ==0) 
+        {
+            this.x = pX;
+            this.y = pY;  
+        }
+        else 
+        {
+            this.currRotated = 0;
+            this.rotating = true;
+            this.movingRotateToPoint = random(-45,45)
+        }
     }
 
     Move()
     {
+        let canSee = false;
+        //check for player relative to enemy.
+        let angRelPlay = getWorldAngle2D( this.x,this.y,player.x,player.y);
+        if((this.angle*180/pi)-(angRelPlay*180/pi) > 320 && (this.angle*180/pi)-(angRelPlay*180/pi) < 360)
+        {
+            angRelPlay += 2*pi;
+        }
+        if((angRelPlay*180/pi)- (this.angle*180/pi) > 320 && (angRelPlay*180/pi)-(this.angle*180/pi) < 360)
+        {
+            angRelPlay -= 2*pi;
+        }   
+        
+        
+        let inFOV = (angRelPlay >= this.angle-(30*pi/180) && angRelPlay <= this.angle+(30*pi/180))
+        
+        if(inFOV)
+        {
+            let hitDistance = ShootRay(this.x+this.width/2, this.y+this.width/2,angRelPlay,20);
+            if(hitDistance > dist(this.x, this.y, player.x, player.y))
+            {
+                canSee = true; 
+                // this.currRotated = 0;
+                // this.rotating = true;
+                // this.movingRotateToPoint = this.angle- this.angRelPlay
+                document.getElementById("debug").innerHTML = `(${this.angle},${angRelPlay},${hitDistance})`
+                let rotate = this.rotSpeed * (((angRelPlay-this.angle)/abs(angRelPlay-this.angle)))
+                this.angle += 0.05 * rotate;
+                if(this.angle>2*pi)
+                {
+                    this.angle -= 2*pi;
+                }
+                else if(this.angle<0)
+                {
+                    this.angle += 2*pi;
+                }
+                this.dx = cos(this.angle) * 5;
+                this.dy = sin(this.angle) * 5;
+                this.ForwardMove(0.5);
+            }
+           
+        }
         
         if(this.rotating)
         {
             let rotate = this.rotSpeed * (this.movingRotateToPoint/abs(this.movingRotateToPoint))
-            this.angle += 0.1* rotate;
+            this.angle += 0.05* rotate;
             if(this.angle>2*pi)
             {
                 this.angle -= 2*pi;
@@ -142,23 +202,10 @@ class Enemy
             if(this.currRotated > abs(this.movingRotateToPoint))this.rotating = false; 
             return; 
         }
-        let hitDistance = ShootRay(this.x+this.width/2, this.y+this.width/2,this.angle,10)/8;
         
-        if(hitDistance <= this.rayDetectLength)
-        {
-            
-            this.currRotated = 0;
-            this.rotating = true;
-            this.movingRotateToPoint = random(-90,90)
-            console.log(this.movingRotateToPoint)
-            return;
-        }
-        let pX = this.x +this.dx * this.speed ; 
-        let pY = this.y + this.dy* this.speed; 
-        if(mapLayout[floor((pX+this.width)/64)+floor((pY+this.width)/64)*mapX] ==0 && mapLayout[floor((pX-this.width)/64)+floor((pY-this.width)/64)*mapX] ==0) 
-        {
-            this.x = pX;
-            this.y = pY;  
-        }
+        this.ForwardMove(1);
+        
+        
+        
     }
 }
