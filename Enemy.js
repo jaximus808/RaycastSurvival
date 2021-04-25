@@ -23,6 +23,7 @@ class Enemy
         this.rotating = false;
         this.id = id;
         this.health = health;
+        this.setMaxHealth = health;
     }
 
     Render()
@@ -85,7 +86,7 @@ class Enemy
             //console.log(ratioOfDist)
             //curImage.loadPixels();
             // console.log(curImage.width)
-            let x = 0;
+
             noStroke()
             for(let i=0; i<objectWidth; i++)
             {
@@ -95,8 +96,15 @@ class Enemy
                 if(zDepthBuffer[ objectColumn] > distan*16)
                 {
                     //var lineH = (mapS*windowW)/distT
-                    x++;
-                    fill(color(spriteColors[this.colorIndex-1]))
+                    
+                    if(sampleX/objectWidth <=  this.health/this.setMaxHealth)
+                    {
+                        fill(color(spriteColors[this.colorIndex-1]))
+                    }
+                    else 
+                    {
+                        fill(color(random(255),random(255),random(255)))
+                    }
                     rect( floor(sampleX*2+renderXPos-objectWidth),objectCeiling-objectHeight/2,2,(mapS*windowW)/(distan*16))
                 
                     
@@ -122,10 +130,43 @@ class Enemy
        
     }
     
-    ForwardMove(multiplierSpeed)
+    ForwardMove(multiplierSpeed,playerSee)
     {
         let pX = this.x +this.dx * (this.speed*multiplierSpeed) ; 
-        let pY = this.y + this.dy* (this.speed*multiplierSpeed) 
+        let pY = this.y + this.dy* (this.speed*multiplierSpeed)
+
+        // //point 1 check
+        // if(mapLayout[floor((pX+this.width/2)/64)+floor((pY)/64)*mapX] > 1)
+        // {
+        //     this.y = pY;
+        // } 
+        // //point 2 check
+        // else if(mapLayout[floor((pX+this.width/2)/64)+floor((pY)/64)*mapX] > 1)
+        // {
+        //     this.x = pX;
+        // }
+        // //point 3 check
+        // else if(mapLayout[floor((pX)/64)+floor((pY+this.width/2)/64)*mapX] > 1)
+        // {
+        //     this.y = pY;
+        // }
+        // //point 4 check
+        // else if(mapLayout[floor((pX+this.width/2)/64)+floor((pY+this.width)/64)*mapX] > 1)
+        // {
+        //     this.x = pX;
+        // }
+        // //corners 
+        // else if(mapLayout[floor((pX+this.width/2)/64)+floor((pY+this.width/2)/64)*mapX] ==0 && mapLayout[floor((pX-this.width/2)/64)+floor((pY-this.width/2)/64)*mapX] ==0&&mapLayout[floor((pX-this.width/2)/64)+floor((pY+this.width/2)/64)*mapX] ==0 && mapLayout[floor((pX+this.width/2)/64)+floor((pY-this.width/2)/64)*mapX] ==0)
+        // {
+        //     this.x = pX;
+        //     this.y = pY;  
+        // }
+        // else 
+        // {
+        //     this.currRotated = 0;
+        //     this.rotating = true;
+        //     this.movingRotateToPoint = random(-45,45)
+        // }
         if(mapLayout[floor((pX+this.width)/64)+floor((pY+this.width)/64)*mapX] ==0 && mapLayout[floor((pX-this.width)/64)+floor((pY-this.width)/64)*mapX] ==0&&mapLayout[floor((pX-this.width)/64)+floor((pY+this.width)/64)*mapX] ==0 && mapLayout[floor((pX+this.width)/64)+floor((pY-this.width)/64)*mapX] ==0) 
         {
             this.x = pX;
@@ -133,14 +174,17 @@ class Enemy
         }
         else 
         {
+            
             this.currRotated = 0;
             this.rotating = true;
             this.movingRotateToPoint = random(-45,45)
+            
         }
     }
 
     Move()
     {
+
         let canSee = false;
         //check for player relative to enemy.
         let angRelPlay = getWorldAngle2D( this.x,this.y,player.x,player.y);
@@ -153,20 +197,30 @@ class Enemy
             angRelPlay -= 2*pi;
         }   
         
-        
+
         let inFOV = (angRelPlay >= this.angle-(30*pi/180) && angRelPlay <= this.angle+(30*pi/180))
-        
+        //console.log( this.dx +1)
         if(inFOV)
         {
-            let hitDistance = ShootRay(this.x+this.width/2, this.y+this.width/2,angRelPlay,20);
+            let hitDistance = ShootRay(this.x+this.width/2, this.y+this.width/2,angRelPlay,20)[0];
             if(hitDistance > dist(this.x, this.y, player.x, player.y))
             {
                 canSee = true; 
                 // this.currRotated = 0;
                 // this.rotating = true;
                 // this.movingRotateToPoint = this.angle- this.angRelPlay
-                document.getElementById("debug").innerHTML = `(${this.angle},${angRelPlay},${hitDistance})`
-                let rotate = this.rotSpeed * (((angRelPlay-this.angle)/abs(angRelPlay-this.angle)))
+                //document.getElementById("debug").innerHTML = `(${this.angle},${angRelPlay},${hitDistance})`
+                let rotate;
+                if(angRelPlay-this.angle == 0)
+                {
+                    rotate = 0;
+                }
+                else 
+                {
+                    
+                    rotate = this.rotSpeed * (((angRelPlay-this.angle)/abs(angRelPlay-this.angle)))
+                }
+                
                 this.angle += 0.05 * rotate;
                 if(this.angle>2*pi)
                 {
@@ -178,7 +232,9 @@ class Enemy
                 }
                 this.dx = cos(this.angle) * 5;
                 this.dy = sin(this.angle) * 5;
-                this.ForwardMove(0.5);
+
+                this.ForwardMove(1.5);
+                return
             }
            
         }
@@ -206,6 +262,35 @@ class Enemy
         this.ForwardMove(1);
         
         
+        
+    }
+
+    Damage(amount)
+    {
+        let enemyKeys = Object.keys(EnemyCollection);
+        for(let i = 0; i <enemyKeys.length; i++)
+        {
+            let index = enemyKeys[i];
+            if(radiusSound > dist( EnemyCollection[index].x,EnemyCollection[index].y,player.x,player.y) || this.id == index)
+            {
+                let angRelPlay = getWorldAngle2D( EnemyCollection[index].x,EnemyCollection[index].y,player.x,player.y);
+                EnemyCollection[index].angle = angRelPlay
+                EnemyCollection[index].dx = cos(EnemyCollection[index].angle) * 5;
+                EnemyCollection[index].dy = sin(EnemyCollection[index].angle) * 5;
+            }
+            
+        }
+
+        
+        
+        
+        this.health -= amount;
+        console.log(`Enemy with id: ${this.id} has ${this.health} health`)
+        if(this.health <= 0)
+        {
+            enemyDeleteBuffer.push(this.id);
+        }
+
         
     }
 }

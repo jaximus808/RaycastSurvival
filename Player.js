@@ -1,5 +1,5 @@
 class Player {
-    constructor(startX, startY, r, speed,angle,pi,rotSpeed, fireRate) {
+    constructor(startX, startY, r, speed,angle,pi,rotSpeed, fireRate,gunDamage) {
         this.x = startX;
         this.y = startY;
         this.angle = angle;
@@ -14,7 +14,8 @@ class Player {
         this.shootAnim = false;
         this.fireRate = fireRate;
         this.curTime = 0;
-        this.shootCheckIntev = setInterval(this.ShootLogic, 500);
+        this.shootCheckIntev = setInterval(this.ShootLogic, 100);
+        this.gunDamage = gunDamage
     }
 
     TwoDRender() {
@@ -40,7 +41,7 @@ class Player {
     ShootLogic()
     {
         if(!locked) return;
-        console.log(player.shooting)
+        //console.log(player.shooting)
         if(!player.shooting) return; 
         
         if(player.curTime >= player.fireRate)
@@ -52,7 +53,7 @@ class Player {
         {
             player.shootAnim = false;
         }
-        player.curTime += 0.5;
+        player.curTime += 0.1;
 
     }
 
@@ -62,7 +63,61 @@ class Player {
         this.shooting = true
         this.curTime = 0;
         this.shootAnim = true;  
-        console.log(this.shooting)
+
+        //Shoot detecting lord save me LOL
+        let inFovEnemy = [];
+        let enemyKeys = Object.keys(EnemyCollection)
+        for(let i = 0; i < enemyKeys.length;i++)
+        {
+            let enemyInstance = EnemyCollection[enemyKeys[i]];
+            let angRelPlay = getWorldAngle2D( this.x,this.y, enemyInstance.x,enemyInstance.y)
+            if((this.angle*180/pi)-(angRelPlay*180/pi) > 320 && (this.angle*180/pi)-(angRelPlay*180/pi) < 360)
+            {
+                angRelPlay += 2*pi;
+            }
+            if((angRelPlay*180/pi)- (this.angle*180/pi) > 320 && (angRelPlay*180/pi)-(this.angle*180/pi) < 360)
+            {
+                angRelPlay -= 2*pi;
+            }   
+            let radFOV = rayAmount * pi/180
+            let inFOV = (angRelPlay >= this.angle-radFOV/2 && angRelPlay <= this.angle+radFOV/2)
+            if(inFOV)
+            {
+                inFovEnemy.push(enemyKeys[i]);
+            }
+            
+        }
+        let rayInfo = ShootRay(this.x, this.y, this.angle, 20);
+        let InWay = [];
+        for(let i = 0; i < inFovEnemy.length; i++)
+        {
+            let enemyInstance = EnemyCollection[inFovEnemy[i]];
+            stroke(5)
+            line(rayInfo[1]/8, rayInfo[2]/8, this.x/8, this.y/8)
+            noStroke()
+            //console.log( collideLineRect(rayInfo[1], rayInfo[2], this.x, this.y, enemyInstance.x, enemyInstance.y, enemyInstance.width, enemyInstance.width))
+            if(rayInfo[0] > dist(enemyInstance.x, enemyInstance.y, this.x, this.y) && (collideLineRect(rayInfo[1], rayInfo[2], this.x, this.y, enemyInstance.x-enemyInstance.width, enemyInstance.y, enemyInstance.width, enemyInstance.width)) || collideLineRect(rayInfo[1], rayInfo[2], this.x, this.y, enemyInstance.x, enemyInstance.y-enemyInstance.width, enemyInstance.width, enemyInstance.width)) //||collideLineRect(rayInfo[1], rayInfo[2], this.x, this.y, enemyInstance.x-enemyInstance.width/2, enemyInstance.y - enemyInstance.width/2, enemyInstance.width, enemyInstance.width))
+            {
+                InWay.push([enemyInstance.id,dist(enemyInstance.x, enemyInstance.y, this.x, this.y)]);
+            }
+        }
+        if(InWay.length ==0 ) return
+        let closet = 2000000
+        let closetid = 0;
+        for(let i = 0; i < InWay.length; i++)
+        {
+            if(InWay[i][1] < closet)
+            {
+                closet = InWay[i][1]
+                closetid = InWay[i][0]
+            }
+        }
+        
+        EnemyCollection[closetid].Damage(this.gunDamage);
+        
+        //console.log(closet)
+        
+
     }
 
     move(mouseXMove) 

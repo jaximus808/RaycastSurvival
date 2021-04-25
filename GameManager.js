@@ -31,17 +31,31 @@ var mapX = 20;
 var mapY = 20;
 var mapS = 64;
 
+let TimerWave = 5;
+let curTimerWave = 0;
+let timing = false;
+
 var enemy1 = [];
 
 var idleGunSprite; 
 var shootGunSprite; //pistol
-var shootAnim = 0.5; 
+var shootAnim = 0.3; 
 
 var mouseXMove = 0;
 var mouseYMove = 0; 
 var playerSpriteWidth;
 var playerSpriteHeight;
 var zDepthBuffer = [];
+let enemyDeleteBuffer = [];
+
+var ZenFont; 
+
+var Score=0;
+var HighScore = 0; 
+var Wave=0;
+var EnemiesLeft=0; 
+
+var radiusSound = 7*64;
 
 //zero represents empty spaces, 1 represeants a square.
 var mapLayout = [
@@ -74,6 +88,7 @@ function preload()
     playerSpriteHeight = windowH/2
     idleGunSprite = loadImage("./Assets/ResizePixelGunSprite2_Idle.png")
     shootingGunSprite = loadImage("./Assets/ResizePixelGunSprite4_Shoot.png")
+    ZenFont = loadFont("./Assets/Zen_Dots/ZenDots-Regular.ttf")
 }
 
 function setup() 
@@ -83,10 +98,13 @@ function setup()
     DR = 0.0174533
     angleMode(RADIANS);
     
-    player = new Player(161,300, 2, 1,90*pi/180,pi,0.01,1.5)
+    player = new Player(161,300, 2, 1,90*pi/180,pi,0.01,0.5,1)
     //EnemyCollection.push(new Enemy(813,615,enemy1,FOVAng ,2,20,1,1,10));
-    AddEnemy(813,615,20,1,1,10,2)
-    AddEnemy(813,615,20,1,1,10,2)
+    WaveManager();
+    // AddEnemy(813,615,20,1,1,10,4)
+    // AddEnemy(813,615,20,1,1,10,4)
+    // EnemyCollection[0].id;
+    // EnemyCollection[1].id
     createCanvas(windowW, windowH,enemy1);
     canvOb = document.getElementById("defaultCanvas0")
     canvOb.addEventListener("mousemove", e =>
@@ -102,7 +120,25 @@ function setup()
     })
 }
 
+function WaveManager()
+{
+    Wave += 1;
+    curTimerWave = 0; 
+    timing = true; 
+}
 
+function EnemyManager()
+{
+    
+    let amountOfEnemies = Wave;
+    if(amountOfEnemies > 7) amountOfEnemies = 7
+    let health = floor(Wave/2) + 2
+    if(health > 10 ) health = 10; 
+    for(let i = 0; i < amountOfEnemies; i++)
+    {
+        AddEnemy(954,random(96, 1194),20,1,1,10,health)
+    }
+}
 
 function draw() 
 {
@@ -123,10 +159,37 @@ function draw()
     //     enemy.Render();
     // }
     let enemiesKeys = Object.keys(EnemyCollection);
+    let enemiesRange = [];
     for(let i = 0; i < enemiesKeys.length; i++)
     {
-        EnemyCollection[enemiesKeys[i]].Render();
+        //EnemyCollection[enemiesKeys[i]].Render()
+        enemiesRange.push([dist( EnemyCollection[enemiesKeys[i]].x,EnemyCollection[enemiesKeys[i]].y, player.x,player.y ), enemiesKeys[i]]);
     }
+    //lol shitty sort algo
+    let sortedEnemiesRange = [];
+    for(let i= 0; i < enemiesKeys.length; i++)
+    {
+        let shortest = 0;
+        let indexShort = 0;
+        for(let y = 0; y < enemiesRange.length ; y++)
+        {
+            if(shortest < enemiesRange[y][0])
+            {
+                shortest = enemiesRange[y][0]
+                indexShort = y;
+            }
+        }
+        sortedEnemiesRange.push(enemiesRange[indexShort][1]); 
+        enemiesRange.splice(indexShort, 1);
+    }
+
+    for(let i = 0; i < sortedEnemiesRange.length; i++) EnemyCollection[sortedEnemiesRange[i]].Render();
+
+
+    // for(let i = 0; i < enemiesKeys.length; i++)
+    // {
+    //     EnemyCollection[enemiesKeys[i]].Render();
+    // }
 
 
     drawMap2D(enemiesKeys);
@@ -135,14 +198,56 @@ function draw()
         
         player.Shoot()
     }
+    let waveAn;
+    if(timing)
+    {
+        waveAn = `Wave ${Wave} starts in: ${abs(curTimerWave -TimerWave) } Seconds`
+    }
+    else 
+    {
+        waveAn = `Wave ${Wave}`
+    }
+
     //player.ShootLogic();
     mouseClickedFrame = false;
     player.Render();
+    fill(0)
+    textFont(ZenFont);
+    textAlign(RIGHT);
+    text(`HighScore: ${HighScore} Score: ${Score} Wave: ${Wave}`, windowW-windowW*0.005,windowW*0.015)
+    text(waveAn, windowW-windowW*0.005,windowW*0.03)
+    fill(color("yellow"))
+    rect(windowW/2-5,windowH/2-5, 10,10)//mini crosshair
+    
     if(!locked) return;
+
+    if(frameCount % 60 == 0 && timing)
+    {
+        
+            curTimerWave++;
+            if(TimerWave == curTimerWave)
+            {
+                timing = false; 
+                EnemyManager();
+            }
+        
+    }
     for(let i = 0; i < enemiesKeys.length; i++)
     {
         EnemyCollection[enemiesKeys[i]].Move();
     }
+    let ran = false;
+    for(let i = 0; i <enemyDeleteBuffer.length; i++)
+    {
+        delete EnemyCollection[enemyDeleteBuffer[i]];
+        ran = true;
+        Score++; 
+    }
+    if(ran && Object.keys(EnemyCollection).length == 0) 
+    {
+        WaveManager()
+    }
+    enemyDeleteBuffer  = []
 
     // for(let enemy in EnemyCollection)
     // {
@@ -200,14 +305,14 @@ function keyPressed()
     }
 }
 
-function AddEnemy(x, y,width,speed, rotSpeed, rayDist)
+function AddEnemy(x, y,width,speed, rotSpeed, rayDist,health)
 {
     
     if(Object.keys(EnemyCollection).length == 0 )
     {
         //(813,615,FOVAng ,2,20,1,1,10,0) 
         //(x, y, FOV,colorIndex,width, speed, rotSpeed,rayDist, id)
-        EnemyCollection[0] = new Enemy(x,y,FOVAng ,2,width,speed,rotSpeed,rayDist,0)
+        EnemyCollection[0] = new Enemy(x,y,FOVAng ,2,width,speed,rotSpeed,rayDist,0,health)
         return;
     }
     let i = 0
@@ -215,11 +320,12 @@ function AddEnemy(x, y,width,speed, rotSpeed, rayDist)
     {
         if(EnemyCollection[i] == undefined)
         {
-            EnemyCollection[i] = new Enemy(x,y,FOVAng ,2,width,speed,rotSpeed,rayDist,0);
+            EnemyCollection[i] = new Enemy(x,y,FOVAng ,2,width,speed,rotSpeed,rayDist,i,health);
             return;
         }
     }
-    EnemyCollection[i+1] = new Enemy(x,y,FOVAng ,2,width,speed,rotSpeed,rayDist,0)
+    console.log(i)
+    EnemyCollection[i] = new Enemy(x,y,FOVAng ,2,width,speed,rotSpeed,rayDist,i,health)
 }
 
 function getWorldAngle2D(x1,y1,x2,y2)
@@ -277,7 +383,7 @@ function drawMap2D(enemiesKeys)
     for(let i = 0; i < enemiesKeys.length; i++)
     {
         let enemyInst = EnemyCollection[enemiesKeys[i]]
-        ellipse(enemyInst.x/8,enemyInst.y/8,4,4)
+        rect(enemyInst.x/8,enemyInst.y/8,enemyInst.width/8,enemyInst.width/8)
         line(enemyInst.x/8,enemyInst.y/8, (enemyInst.x + enemyInst.dx*8)/8, (enemyInst.y + enemyInst.dy*8)/8);
     }
     
@@ -413,11 +519,14 @@ function ShootRay(x1,y1, angle,rayDist)
         }
         //render horizontal side 
         stroke(5)
+        let tX, tY;
         if(distX < distY)
         {
             //line(x1/8, y1/8, enemy.x/8+ xXS/8, enemy.y/8 + xYS/8)
             //console.log(`ray ${r} has pos of: ${xXS}, ${xYS}`)
             // fill(color(xColors[colorXId][0],xColors[colorXId][1],xColors[colorXId][2]));
+            tX = xXS;
+            tY = xYS;
             distT = distX;
         }
         //render vertical
@@ -426,12 +535,14 @@ function ShootRay(x1,y1, angle,rayDist)
             // fill(color(yColors[colorYId][0],yColors[colorYId][1],yColors[colorYId][2]));
             //line(x1/8, y1/8, enemy.x/8+ yXS/8, enemy.y/8+ yYS/8)
             //console.log(`ray ${r} has pos of: ${yXS}, ${yYS}`)
+            tX = yXS;
+            tY = yYS;
             distT = distY;
         }
         noStroke()
         //line(x1/8,y1/8)
         
-        return distT;
+        return [distT,tX,tY];
 }
 
 
