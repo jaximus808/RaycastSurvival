@@ -1,3 +1,5 @@
+//Code was inspired from raycaster resources online. Created by Jaxon Poentis. @soljaxon on insta :)
+
 var borderWidth = 2;
 
 var windowH = window.innerHeight*0.95;
@@ -16,6 +18,8 @@ console.log(windowW)
 console.log(windowH)
 // var GameScreenX = 1080;
 // var GameScreenY = 640;
+
+let pistolBlast;
 
 var pi;
 var DR;
@@ -38,7 +42,9 @@ let timing = false;
 var enemy1 = [];
 
 var idleGunSprite; 
-var shootGunSprite; //pistol
+var shootGunSprite;
+var idleGunSpriteTrans; 
+var shootGunSpriteTrans; //pistol
 var shootAnim = 0.3; 
 
 var mouseXMove = 0;
@@ -49,13 +55,30 @@ var zDepthBuffer = [];
 let enemyDeleteBuffer = [];
 
 var ZenFont; 
+var HighScore = 0;
+if(window.localStorage.getItem("HighScore"))
+{
+    HighScore = window.localStorage.getItem("HighScore")
+}
+else 
+{
+    HighScore = 0;
+}
 
 var Score=0;
-var HighScore = 0; 
+ 
 var Wave=0;
 var EnemiesLeft=0; 
 
 var radiusSound = 7*64;
+
+let healthBarWidth = windowW/4
+let PlayerHealth = 100; 
+const invulnerableDur = 3;  
+
+let homepageButton;
+
+let fps;
 
 //zero represents empty spaces, 1 represeants a square.
 var mapLayout = [
@@ -81,6 +104,10 @@ var mapLayout = [
     1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
 ]
 
+function HomePageMove()
+{
+    location.href = "index.html"
+}
 
 function preload()
 {
@@ -89,15 +116,24 @@ function preload()
     idleGunSprite = loadImage("./Assets/ResizePixelGunSprite2_Idle.png")
     shootingGunSprite = loadImage("./Assets/ResizePixelGunSprite4_Shoot.png")
     ZenFont = loadFont("./Assets/Zen_Dots/ZenDots-Regular.ttf")
+    pistolBlast = loadSound("./Assets/BlastSoundPistCropped.mp3")
 }
 
 function setup() 
 {
-    
+    homepageButton = createButton('HomePage')
+    homepageButton.position(50,windowH-20);
+    homepageButton.mousePressed(HomePageMove)
     pi = PI;
     DR = 0.0174533
     angleMode(RADIANS);
     
+    idleGunSpriteTrans = createGraphics(playerSpriteWidth,playerSpriteHeight)
+    shootGunSpriteTrans = createGraphics(playerSpriteWidth,playerSpriteHeight)
+    idleGunSpriteTrans.tint(255,127)
+    shootGunSpriteTrans.tint(255,127)
+    idleGunSpriteTrans.image(idleGunSprite,0,0,playerSpriteWidth,playerSpriteHeight)
+    shootGunSpriteTrans.image(shootingGunSprite,0,0,playerSpriteWidth,playerSpriteHeight)
     player = new Player(161,300, 2, 1,90*pi/180,pi,0.01,0.5,1)
     //EnemyCollection.push(new Enemy(813,615,enemy1,FOVAng ,2,20,1,1,10));
     WaveManager();
@@ -142,6 +178,7 @@ function EnemyManager()
 
 function draw() 
 {
+    fps = frameRate();
     //collideRectRect(x, y, width, height, x2, y2, width2, height2 )
     clear();
     if(!called)
@@ -193,6 +230,7 @@ function draw()
 
 
     drawMap2D(enemiesKeys);
+    healthRender()
     if(locked && mouseClickedFrame)
     {
         
@@ -273,7 +311,13 @@ document.getElementsByTagName("body")[0].addEventListener("mousedown",(e) =>
     mouseClickedFrame = true;
 })
 
-
+function healthRender()
+{
+    fill(color(34,34,34))
+    rect(mapX*8+10, 10, healthBarWidth,20)
+    fill(color("green"))
+    rect(mapX*8+10, 10, player.curHealth/PlayerHealth*healthBarWidth,20)
+}
 
 function ToggleLockMouse()
 {
@@ -369,9 +413,12 @@ function drawMap2D(enemiesKeys)
         }
     }
     
-    fill(color("black"))
+    fill(color("blue"))
     ellipse(player.x/8,player.y/8,4,4)
     stroke(5)
+    fill(color("black"))
+    line(player.x/8,player.y/8, (player.x + player.dx*8)/8, (player.y + player.dy*8)/8)
+    
     // for(let i = 0; i < EnemyCollection.length; i++)
     // {
     //     ellipse(EnemyCollection[i].x/8,EnemyCollection[i].y/8,4,4)

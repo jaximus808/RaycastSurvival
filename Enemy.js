@@ -180,11 +180,18 @@ class Enemy
             this.movingRotateToPoint = random(-45,45)
             
         }
+        
+        
+        //console.log( collideRectCircle(this.x, this.y, this.width,this.width, player.x, player.x, 32) )
     }
 
     Move()
     {
 
+        if( collideRectRect(this.x, this.y, this.width,this.width, player.x, player.y, player.radius,player.radius) )
+        {
+            player.TakeDamage(10)
+        }
         let canSee = false;
         //check for player relative to enemy.
         let angRelPlay = getWorldAngle2D( this.x,this.y,player.x,player.y);

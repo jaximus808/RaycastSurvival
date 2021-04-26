@@ -20,3 +20,40 @@ body
     top:0px;
     right: 10;
 }
+
+#title
+{
+    position: absolute;
+    top:200px;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 50px;
+}
+
+#subtitle
+{
+    position: absolute;
+    top:250px;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+#buttonPlay
+{
+    position: absolute;
+    top: 350px;
+    left: 50%;
+    transform: translate(-50%,-50%); 
+    font-size: 25px; 
+}
+#InfoParent
+{
+    position: absolute;
+    top:500px;
+    left: 50%;
+    transform: translate(-50%,-50%);  
+}
+#infoTitle
+{
+    font-size: 30px
+}
