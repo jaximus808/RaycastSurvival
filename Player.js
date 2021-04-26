@@ -175,7 +175,7 @@ class Player {
             this.speed *= 2;
             shift = true;
         }
-        if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
+        if ( keyIsDown(68)) {
             let ang = this.angle + (pi/2);
             if(ang>this.tPi)
             {
@@ -202,7 +202,7 @@ class Player {
             // }
         }
 
-        if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
+        if (keyIsDown(65)) {
             let ang = this.angle - (pi/2);
             if(ang>this.tPi)
             {
@@ -231,7 +231,7 @@ class Player {
             // }
         }
 
-        if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
+        if ( keyIsDown(87)) {
             let pX = this.x +this.dx * this.speed ; 
             let pY = this.y + this.dy* this.speed; 
             let xo,yo;
@@ -270,29 +270,56 @@ class Player {
             //     this.y = pY ;  
             // }
         }
-
-        if(mouseXMove > 0)
+        if(mouseXMove != 0)
         {
-            //turned right
-            this.angle += 0.1 * this.rotSpeed *mouseXMove;
-            if(this.angle>this.tPi)
+            if(mouseXMove > 0)
             {
-                this.angle -= this.tPi;
+                //turned right
+                this.angle += 0.1 * this.rotSpeed *mouseXMove;
+                if(this.angle>this.tPi)
+                {
+                    this.angle -= this.tPi;
+                }
+                this.dx = cos(this.angle)*5;
+                this.dy = sin(this.angle)*5;
             }
-            this.dx = cos(this.angle)*5;
-            this.dy = sin(this.angle)*5;
+            if(mouseXMove < 0)
+            {
+                //turned left
+                this.angle += 0.1 * this.rotSpeed *  mouseXMove;
+                if(this.angle<0)
+                {
+                    this.angle+= this.tPi;
+                }
+                this.dx = cos(this.angle)*5;
+                this.dy = sin(this.angle)*5;
+            }
         }
-        if(mouseXMove < 0)
+        else 
         {
-            //turned left
-            this.angle += 0.1 * this.rotSpeed *  mouseXMove;
-            if(this.angle<0)
+            if(keyIsDown(LEFT_ARROW))
             {
-                this.angle+= this.tPi;
+                //turned left
+                this.angle -= 0.1 * this.rotSpeed *  20;
+                if(this.angle<0)
+                {
+                    this.angle+= this.tPi;
+                }
+                this.dx = cos(this.angle)*5;
+                this.dy = sin(this.angle)*5;
             }
-            this.dx = cos(this.angle)*5;
-            this.dy = sin(this.angle)*5;
+            if(keyIsDown(RIGHT_ARROW))
+            {
+                this.angle += 0.1 * this.rotSpeed *20;
+                if(this.angle>this.tPi)
+                {
+                    this.angle -= this.tPi;
+                }
+                this.dx = cos(this.angle)*5;
+                this.dy = sin(this.angle)*5;
+            }
         }
+        
         if(shift)
         {
             this.speed /= 2;

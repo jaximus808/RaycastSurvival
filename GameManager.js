@@ -347,6 +347,10 @@ function keyPressed()
         document.getElementById("state").innerHTML = "Status: Paused (MouseUnlocked)"
         locked = false;;
     }
+    if(keyCode == 32)
+    {
+        mouseClickedFrame = true;
+    }
 }
 
 function AddEnemy(x, y,width,speed, rotSpeed, rayDist,health)
