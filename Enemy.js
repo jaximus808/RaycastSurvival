@@ -103,7 +103,7 @@ class Enemy
                     }
                     else 
                     {
-                        fill(color(random(255),random(255),random(255)))
+                        fill(color(0,127.5))
                     }
                     rect( floor(sampleX*2+renderXPos-objectWidth),objectCeiling-objectHeight/2,2,(mapS*windowW)/(distan*16))
                 

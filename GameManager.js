@@ -134,7 +134,7 @@ function setup()
     shootGunSpriteTrans.tint(255,127)
     idleGunSpriteTrans.image(idleGunSprite,0,0,playerSpriteWidth,playerSpriteHeight)
     shootGunSpriteTrans.image(shootingGunSprite,0,0,playerSpriteWidth,playerSpriteHeight)
-    player = new Player(161,300, 2, 1,90*pi/180,pi,0.01,0.5,1)
+    player = new Player(161,300, 2, 1,90*pi/180,pi,0.01,0.3,1)
     //EnemyCollection.push(new Enemy(813,615,enemy1,FOVAng ,2,20,1,1,10));
     WaveManager();
     // AddEnemy(813,615,20,1,1,10,4)
