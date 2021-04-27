@@ -12,6 +12,24 @@
         <div id="coords"></div>
         <div id ="debug"></div> 
         <div id ="debug1"></div> 
+        <div id="UpgradeMenu">
+            <div id = "UpgradeTitle">Upgrade Menu, Use points to make the game easier!</div>
+            <div id = "ButtonHolder">
+                <div id="UpgradeButtonPosition1" class="UpgradeButtonArea">
+                    <button id="upgradeButton0" class="upgradeButtonDesign"onclick="UpgradeDamage()">Upgrade Damage Lv.1</button>    
+                    <p class="CostDesgin" id = "Cost0">0 points</p>
+                </div>
+                <div id="UpgradeButtonPosition2" class="UpgradeButtonArea">
+                    <button id="upgradeButton1" class="upgradeButtonDesign"onclick="UpgradeROF()">Upgrade Rate Of Fire Lv.1</button>    
+                    <p class="CostDesgin" id="Cost1">0 points</p>
+                </div>
+                <div id="UpgradeButtonPosition3" class="UpgradeButtonArea">
+                    <button id="upgradeButton2" class="upgradeButtonDesign"onclick="UpgradeHealth()">Upgrade Health Lv.1</button>    
+                    <p class="CostDesgin" id="Cost2" >0 points</p>
+                </div>
+            </div>
+            <button id="CloseButton" onclick="hideUpgrade()">x</button> 
+        </div>
         <script src="Enemy.js"></script>
         <script src="Player.js"></script>
         <script src="GameManager.js"></script>

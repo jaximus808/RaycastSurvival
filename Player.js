@@ -63,6 +63,10 @@ class Player {
         this.curHealth -= damage; 
         if(this.curHealth <= 0 ) 
         {
+            fill(color(34,34,34))
+            rect(mapX*8+10, 10, healthBarWidth,20)
+            fill(color("green"))
+            rect(mapX*8+10, 10, 0,20)
             window.alert("Dead")
             window.localStorage.setItem("HighScore" , Score)
             location.reload(); // put something better here later and save highscore.
@@ -159,7 +163,7 @@ class Player {
             }
         }
         
-        EnemyCollection[closetid].Damage(this.gunDamage);
+        EnemyCollection[closetid].Damage(this.gunDamage + damageAddOn);
         
         
         //console.log(closet)
@@ -319,11 +323,29 @@ class Player {
                 this.dy = sin(this.angle)*5;
             }
         }
-        
+        if(keyIsDown(69) && mapLayout[35] == 5 && document.getElementById("UpgradeMenu").style.display == "none") {document.getElementById("UpgradeMenu").style.display = "inline" ; ToggleLockMouse()}
         if(shift)
         {
             this.speed /= 2;
         }
 
+        if(collidePointCircle(this.x, this.y, 992, 96, 260))
+        {
+            mapLayout[35] = 5  
+        }
+        else if(mapLayout[35] == 5)
+        {
+            mapLayout[35] = 4
+        }
+        //document.getElementById("debug").innerHTML = `(${(mapLayout[(floor(this.y/64) * mapX + floor((this.x+64)/64))]) })`
+        // if(mapLayout[floor((this.y-64)/64) * mapX + floor((this.x+64)/64) ] >= 4) //|| || mapLayout[(floor((this.y-64)/64) * mapX + floor((this.x)/64)) ] >= 4 || mapLayout[(floor(this.y/64) * mapX + floor((this.x-64)/64)) ] >= 4|| mapLayout[(floor((this.y-64)/64) * mapX + floor((this.x-64)/64)) ] >= 4)
+        // {
+        //     mapLayout[floor((this.y-64)/64) * mapX + floor((this.x+64)/64)] = 5
+        // }
+        // else if(mapLayout[(floor(this.y/64) * mapX + floor((this.x+64)/64)) ] >= 4)
+        // {
+        //     mapLayout[(floor(this.y/64) * mapX + floor((this.x+64)/64)) ]
+        // }
+        
     }
 }

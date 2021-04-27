@@ -4,8 +4,8 @@ var borderWidth = 2;
 
 var windowH = window.innerHeight*0.95;
 
-var xColors = [[255,0,0],[0,0,255],[214, 116, 211]]
-var yColors = [[180,0,0],[0,0,180],[171, 92, 168]]
+var xColors = [[255,0,0],[0,0,255],[214, 116, 211], [52,155,7],[221,205,13]]
+var yColors = [[180,0,0],[0,0,180],[171, 92, 168], [33,99,4],[182,168,9]]
 var spriteColors = [[53, 242, 60],[0, 0, 0],[120, 8, 8]]
 
 var mouseClickedFrame = false; 
@@ -80,10 +80,30 @@ let homepageButton;
 
 let fps;
 
+let UpgradeBut0 = document.getElementById("upgradeButton0");
+let UpgradeBut1 = document.getElementById("upgradeButton1");
+let UpgradeBut2 = document.getElementById("upgradeButton2");
+
+let UpgradeCost0 = document.getElementById("Cost0");
+let UpgradeCost1 = document.getElementById("Cost1");
+let UpgradeCost2 = document.getElementById("Cost2");
+
+let damageLevel = 0;
+let ROFLevel = 0;
+let HealthLevel = 0;
+
+let damageCost = 5;
+let ROFCost = 5;
+let HealthCost = 5;
+
+let damageAddOn = 0;
+let rateOfFireAddOn = 0;
+let healthAddOn = 0;
+
 //zero represents empty spaces, 1 represeants a square.
 var mapLayout = [
     1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
-    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 4, 0, 0,0,1,
     1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
     1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 2, 0, 0, 0, 0, 0,0,1,
     1, 0, 0, 0, 0, 2 ,2, 0,0,0,0, 0, 3, 0, 0, 0, 0, 0,0,1,
@@ -127,7 +147,7 @@ function setup()
     pi = PI;
     DR = 0.0174533
     angleMode(RADIANS);
-    
+    document.getElementById("UpgradeMenu").style.display = "none"
     idleGunSpriteTrans = createGraphics(playerSpriteWidth,playerSpriteHeight)
     shootGunSpriteTrans = createGraphics(playerSpriteWidth,playerSpriteHeight)
     idleGunSpriteTrans.tint(255,127)
@@ -154,8 +174,56 @@ function setup()
         mouseYMove = movementY;
        ;
     })
+
+    UpgradeCost0.innerHTML = `Cost: ${damageCost} points`
+    UpgradeCost1.innerHTML = `Cost: ${ROFCost} points`
+    UpgradeCost2.innerHTML = `Cost: ${HealthCost} points`
 }
 
+function hideUpgrade()
+{
+    document.getElementById("UpgradeMenu").style.display = "none"
+    ToggleLockMouse();
+}
+
+function UpgradeDamage()
+{
+    if(Score < damageCost) return 
+    Score -= damageCost;
+    damageAddOn+=1;
+    damageCost += damageAddOn*5
+    UpgradeBut0.innerHTML = `Upgrade Damage Lv.${damageAddOn+1}`
+    UpgradeCost0.innerHTML = `Cost: ${damageCost} points`
+
+}
+
+function UpgradeROF()
+{
+    if(Score < ROFCost && player.fireRate - 0.05 <= 0) return 
+    Score -= ROFCost;
+    rateOfFireAddOn+=1;
+    ROFCost += rateOfFireAddOn*5
+    player.fireRate -= 0.01
+    UpgradeCost1.innerHTML = `Cost: ${ROFCost} points`
+    if(player.fireRate - 0.05 <= 0)
+    {
+        UpgradeCost1.innerHTML = `Level Maxed Out`
+    }
+    
+    UpgradeBut1.innerHTML = `Upgrade Rate Of Fire Lv.${rateOfFireAddOn+1}`
+
+}
+function UpgradeHealth()
+{
+    if(Score < HealthCost) return 
+    Score -= HealthCost;
+    healthAddOn+=1;
+    HealthCost += healthAddOn*5
+    player.curHealth += 20;
+    PlayerHealth += 5
+    UpgradeCost2.innerHTML = `Cost: ${HealthCost} points`
+    UpgradeBut2.innerHTML = `Upgrade Health Lv.${healthAddOn+1}`
+}
 function WaveManager()
 {
     Wave += 1;
@@ -167,9 +235,9 @@ function EnemyManager()
 {
     
     let amountOfEnemies = Wave;
-    if(amountOfEnemies > 7) amountOfEnemies = 7
+    if(amountOfEnemies > 21) amountOfEnemies = 21
     let health = floor(Wave/2) + 2
-    if(health > 10 ) health = 10; 
+    if(health > 100 ) health = 100; 
     for(let i = 0; i < amountOfEnemies; i++)
     {
         AddEnemy(954,random(96, 1194),20,1,1,10,health)
@@ -189,7 +257,6 @@ function draw()
     
     //player.TwoDRender();
     drawRays3D()
-    document.getElementById("state").innerHTML = "Status: InGame (MouseLocked)"
     document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)+1},${floor(player.y/64)+1})`
     // for(let enemy in EnemyCollection)
     // {
@@ -254,6 +321,10 @@ function draw()
     textAlign(RIGHT);
     text(`HighScore: ${HighScore} Score: ${Score} Wave: ${Wave}`, windowW-windowW*0.005,windowW*0.015)
     text(waveAn, windowW-windowW*0.005,windowW*0.03)
+    textFont(ZenFont);
+    textAlign(LEFT);
+    text(`Gun Damage Upgrade: Lv.${damageAddOn+1}\nFire Rate Upgrade: Lv.${rateOfFireAddOn+1}\nHealth Upgrade: Lv.${healthAddOn+1}`,mapX*8+10,50)
+    
     fill(color("yellow"))
     rect(windowW/2-5,windowH/2-5, 10,10)//mini crosshair
     
@@ -279,7 +350,7 @@ function draw()
     {
         delete EnemyCollection[enemyDeleteBuffer[i]];
         ran = true;
-        Score++; 
+        Score+= 2; 
     }
     if(ran && Object.keys(EnemyCollection).length == 0) 
     {

@@ -49,7 +49,7 @@ body
 #InfoParent
 {
     position: absolute;
-    top:500px;
+    top:600px;
     left: 50%;
     transform: translate(-50%,-50%);  
 }
@@ -57,3 +57,58 @@ body
 {
     font-size: 30px
 }
+#UpgradeMenu
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%); 
+    width:800px;
+    height: 300px;
+    background-color: #969696;
+    z-index: 5;
+    padding: 10px
+}
+.UpgradeButtonArea
+{
+    background-color: gray;
+    text-align: center;
+}
+
+.upgradeButtonDesign
+{
+    position: relative;
+    top: 10px;
+    
+}
+
+#UpgradeTitle
+{
+    height: 30px;
+}
+
+#ButtonHolder
+{
+    position: absolute;
+    top:60px;
+    width:800px;
+}
+
+#UpgradeTitle
+{
+    text-align: center;
+    position: relative;
+    top:10px 
+}
+#CloseButton
+{
+    position: relative;
+    top:-30px
+}
+/* .CostDesgin
+{
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);  
+} */
