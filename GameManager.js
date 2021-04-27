@@ -199,13 +199,13 @@ function UpgradeDamage()
 
 function UpgradeROF()
 {
-    if(Score < ROFCost && player.fireRate - 0.05 <= 0) return 
+    if(Score < ROFCost || rateOfFireAddOn+1 > 10) return 
     Score -= ROFCost;
     rateOfFireAddOn+=1;
     ROFCost += rateOfFireAddOn*5
     player.fireRate -= 0.01
     UpgradeCost1.innerHTML = `Cost: ${ROFCost} points`
-    if(player.fireRate - 0.05 <= 0)
+    if(rateOfFireAddOn +1  == 10)
     {
         UpgradeCost1.innerHTML = `Level Maxed Out`
     }
