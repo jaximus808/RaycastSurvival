@@ -254,7 +254,11 @@ function draw()
         mouseXMove = 0;
     }
     called = false;
-    
+    fill(color(130,233,255))
+    rect(0,0,windowW,windowH/2)
+    fill(color(88,88,88))
+    rect(0,windowH/2,windowW,windowH/2)
+
     //player.TwoDRender();
     drawRays3D()
     document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)+1},${floor(player.y/64)+1})`
