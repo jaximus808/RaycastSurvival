@@ -104,7 +104,7 @@ body
 #CloseButton
 {
     position: relative;
-    top:-30px
+    top:-30px;
 }
 /* .CostDesgin
 {
@@ -113,3 +113,13 @@ body
     left: 50%;
     transform: translate(-50%,-50%);  
 } */
+
+#state
+{
+    font-size:15px;
+}
+
+#Scroll
+{
+    overflow: auto;
+}

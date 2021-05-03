@@ -199,11 +199,6 @@ class Player {
 
             if(mapLayout[gridY * mapX + gridXOff ] == 0) this.x = pX;
             if(mapLayout[gridYOff*mapX + gridX] == 0) this.y = pY
-            // if(mapLayout[floor(pX/64)+floor(pY/64)*mapX] ==0) 
-            // {
-            //     this.x = pX;
-            //     this.y = pY ;  
-            // }
         }
 
         if (keyIsDown(65)) {

@@ -395,13 +395,13 @@ function ToggleLockMouse()
     //make a play button that starts everything
     if(!locked)
     {
-        document.getElementById("state").innerHTML = "Status: InGame (MouseLocked)"
+        document.getElementById("state").innerHTML = "Status: InGame (MouseLocked) Press 1 to Pause"
         requestPointerLock();
         locked = true;
     }
     else 
     {
-        document.getElementById("state").innerHTML = "Status: Paused (MouseUnlocked)"
+        document.getElementById("state").innerHTML = "Status: Paused (MouseUnlocked) Press 1 to Play"
         exitPointerLock()
         locked = false;;
     }
