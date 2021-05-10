@@ -100,6 +100,9 @@ let damageAddOn = 0;
 let rateOfFireAddOn = 0;
 let healthAddOn = 0;
 
+let chunkX = 0;
+let chunkY = 0;
+
 //zero represents empty spaces, 1 represeants a square.
 var mapLayout = [
     1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
@@ -120,7 +123,7 @@ var mapLayout = [
     1, 0, 0, 0, 0, 2, 2, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
     1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
     1, 0, 0, 0, 2, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
-    1, 0, 0, 0, 0, 0, 0, 0,0,0,0, 0, 0, 0, 0, 0, 0, 0,0,1,
+    1, -1, -1, -1, -1, -1, -1, -1,-1,-1,-1, -1, -1, -1, -1, -1, -1, -1,-1,1,
     1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
 ]
 
@@ -240,7 +243,7 @@ function EnemyManager()
     if(health > 100 ) health = 100; 
     for(let i = 0; i < amountOfEnemies; i++)
     {
-        AddEnemy(954,random(96, 1194),20,1,1,10,health)
+        AddEnemy(random(96,1152),1152,20,1,1,10,health)
     }
 }
 
@@ -471,12 +474,14 @@ function getWorldAngle2D(x1,y1,x2,y2)
 
 function drawMap2D(enemiesKeys)
 {
+    chunkX = floor(player.x/(mapX*64));
+    chunkY = floor(player.y/(mapX*64));
     noStroke()
     let x,y;
-    for(y = 0;y<mapY;y++)
+    for(y = (chunkY*mapX);y<(chunkY*mapX)+mapX;y++)
     {
         
-        for(x = 0; x<mapX; x++)
+        for(x = (chunkX*mapX); x<(chunkX*mapX)+mapX; x++)
         {
             if(mapLayout[y*mapX+x] >= 1 )
             {
@@ -487,6 +492,11 @@ function drawMap2D(enemiesKeys)
             {
                 fill(color("white"));
                 rect(8*x, y*8, 8,8);
+                if(mapLayout[y*mapX+x] == -1)
+                {
+                    fill(color(226,158,95,135));
+                    rect(8*x, y*8, 8,8);        
+                }
             }
             
         }

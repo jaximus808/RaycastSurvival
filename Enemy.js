@@ -167,7 +167,7 @@ class Enemy
         //     this.rotating = true;
         //     this.movingRotateToPoint = random(-45,45)
         // }
-        if(mapLayout[floor((pX+this.width)/64)+floor((pY+this.width)/64)*mapX] ==0 && mapLayout[floor((pX-this.width)/64)+floor((pY-this.width)/64)*mapX] ==0&&mapLayout[floor((pX-this.width)/64)+floor((pY+this.width)/64)*mapX] ==0 && mapLayout[floor((pX+this.width)/64)+floor((pY-this.width)/64)*mapX] ==0) 
+        if(mapLayout[floor((pX+this.width)/64)+floor((pY+this.width)/64)*mapX] <=0 && mapLayout[floor((pX-this.width)/64)+floor((pY-this.width)/64)*mapX] <=0&&mapLayout[floor((pX-this.width)/64)+floor((pY+this.width)/64)*mapX] <=0 && mapLayout[floor((pX+this.width)/64)+floor((pY-this.width)/64)*mapX] <=0) 
         {
             this.x = pX;
             this.y = pY;  

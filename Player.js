@@ -197,8 +197,8 @@ class Player {
             let gridY = floor(this.y/64)
             let gridYOff = floor((this.y+yo)/64)
 
-            if(mapLayout[gridY * mapX + gridXOff ] == 0) this.x = pX;
-            if(mapLayout[gridYOff*mapX + gridX] == 0) this.y = pY
+            if(mapLayout[gridY * mapX + gridXOff ] <= 0) this.x = pX;
+            if(mapLayout[gridYOff*mapX + gridX] <= 0) this.y = pY
         }
 
         if (keyIsDown(65)) {
@@ -220,8 +220,8 @@ class Player {
             let gridY = floor(this.y/64)
             let gridYOff = floor((this.y+yo)/64)
 
-            if(mapLayout[gridY * mapX + gridXOff ] == 0) this.x = pX;
-            if(mapLayout[gridYOff*mapX + gridX] == 0) this.y = pY
+            if(mapLayout[gridY * mapX + gridXOff ] <= 0) this.x = pX;
+            if(mapLayout[gridYOff*mapX + gridX] <= 0) this.y = pY
 
             // if(mapLayout[floor(pX/64)+floor(pY/64)*mapX] ==0) 
             // {
@@ -241,8 +241,8 @@ class Player {
             let gridY = floor(this.y/64)
             let gridYOff = floor((this.y+yo)/64)
 
-            if(mapLayout[gridY * mapX + gridXOff ] == 0) this.x = pX;
-            if(mapLayout[gridYOff*mapX + gridX] == 0) this.y = pY
+            if(mapLayout[gridY * mapX + gridXOff ] <= 0) this.x = pX;
+            if(mapLayout[gridYOff*mapX + gridX] <= 0) this.y = pY
             // if(mapLayout[floor(pX/64)+floor(pY/64)*mapX] ==0) 
             // {
             //     
@@ -261,8 +261,8 @@ class Player {
             let gridY = floor(this.y/64)
             let gridYOff = floor((this.y+yo)/64)
 
-            if(mapLayout[gridY * mapX + gridXOff ] == 0) this.x = pX;
-            if(mapLayout[gridYOff*mapX + gridX] == 0) this.y = pY
+            if(mapLayout[gridY * mapX + gridXOff ] < 1) this.x = pX;
+            if(mapLayout[gridYOff*mapX + gridX] < 1) this.y = pY
             // if(mapLayout[floor(pX/64)+floor(pY/64)*mapX] ==0) 
             // {
             //     this.x = pX;
