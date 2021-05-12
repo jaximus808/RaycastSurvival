@@ -54,7 +54,7 @@ var playerSpriteHeight;
 var zDepthBuffer = [];
 let enemyDeleteBuffer = [];
 var timerDelta = 0;
-
+var timerDeltaWave = 0; 
 var ZenFont; 
 var HighScore = 0;
 if(window.localStorage.getItem("HighScore"))
@@ -66,7 +66,7 @@ else
     HighScore = 0;
 }
 
-var Score=0;
+var Score=-10;
  
 var Wave=0;
 var EnemiesLeft=0; 
@@ -234,6 +234,11 @@ function WaveManager()
     Wave += 1;
     curTimerWave = 0; 
     timing = true; 
+    if(timerDeltaWave <= 600)
+    {
+        Score+= 10;
+    }
+    timerDeltaWave = 0;
 }
 
 function EnemyManager()
@@ -267,7 +272,8 @@ function draw()
     //player.TwoDRender();
     drawRays3D()
     document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)+1},${floor(player.y/64)+1})`
-    document.getElementById("debug1").innerHTML = `FPS:${floor(fps)}`
+    document.getElementById("debug").innerHTML = `FPS:${floor(fps)}`
+    document.getElementById("debug1").innerHTML = `Wave Duration Timer:${floor(timerDeltaWave)}`
     // for(let enemy in EnemyCollection)
     // {
     //     enemy.Render();
@@ -321,6 +327,7 @@ function draw()
     else 
     {
         waveAn = `Wave ${Wave}`
+        timerDeltaWave += timerDelta
     }
 
     //player.ShootLogic();
