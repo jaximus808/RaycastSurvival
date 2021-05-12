@@ -53,6 +53,7 @@ var playerSpriteWidth;
 var playerSpriteHeight;
 var zDepthBuffer = [];
 let enemyDeleteBuffer = [];
+var timerDelta = 0;
 
 var ZenFont; 
 var HighScore = 0;
@@ -144,6 +145,7 @@ function preload()
 
 function setup() 
 {
+    frameRate(60);
     homepageButton = createButton('HomePage')
     homepageButton.position(50,windowH-20);
     homepageButton.mousePressed(HomePageMove)
@@ -265,6 +267,7 @@ function draw()
     //player.TwoDRender();
     drawRays3D()
     document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)+1},${floor(player.y/64)+1})`
+    document.getElementById("debug1").innerHTML = `FPS:${floor(fps)}`
     // for(let enemy in EnemyCollection)
     // {
     //     enemy.Render();
@@ -336,10 +339,11 @@ function draw()
     rect(windowW/2-5,windowH/2-5, 10,10)//mini crosshair
     
     if(!locked) return;
-
-    if(frameCount % 60 == 0 && timing)
+    if(timing){timerDelta += deltaTime/60 }
+    //console.log(timerDelta);
+    if(timerDelta>= 20 && timing)
     {
-        
+            timerDelta = 0;
             curTimerWave++;
             if(TimerWave == curTimerWave)
             {

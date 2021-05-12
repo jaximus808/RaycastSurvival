@@ -132,8 +132,8 @@ class Enemy
     
     ForwardMove(multiplierSpeed,playerSee)
     {
-        let pX = this.x +this.dx * (this.speed*multiplierSpeed) ; 
-        let pY = this.y + this.dy* (this.speed*multiplierSpeed)
+        let pX = this.x +this.dx * (this.speed*multiplierSpeed) * (deltaTime/50); 
+        let pY = this.y + this.dy* (this.speed*multiplierSpeed) * (deltaTime/50);
 
         // //point 1 check
         // if(mapLayout[floor((pX+this.width/2)/64)+floor((pY)/64)*mapX] > 1)

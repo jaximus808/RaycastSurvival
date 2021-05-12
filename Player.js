@@ -174,6 +174,7 @@ class Player {
     move(mouseXMove) 
     {
         var shift = false;
+        let shiftSp = 2;
         if(keyIsDown(16))
         {
             this.speed *= 2;
@@ -187,8 +188,8 @@ class Player {
             }
             let dx = cos(ang)*5;
             let dy = sin(ang)*5;
-            let pX = this.x + dx *this.speed;
-            let pY = this.y + dy * this.speed;
+            let pX = this.x + dx *this.speed * (deltaTime/50);
+            let pY = this.y + dy * this.speed * (deltaTime/50);
             let xo,yo
             if (dx < 0) {xo = -20} else {xo=20};
             if (dy < 0) {yo = -20} else {yo=20};
@@ -209,9 +210,8 @@ class Player {
             }
             let dx = cos(ang)*5;
             let dy = sin(ang)*5;
-            document.getElementById("debug").innerHTML = `(${dx})`
-            let pX = this.x + dx *this.speed;
-            let pY = this.y + dy * this.speed;
+            let pX = this.x + dx *this.speed * (deltaTime/50);
+            let pY = this.y + dy * this.speed * (deltaTime/50);
             let xo,yo
             if ((dx < 0 )) {xo = -20} else {xo=20};
             if (dy < 0) {yo = -20} else {yo=20};
@@ -231,8 +231,8 @@ class Player {
         }
 
         if ( keyIsDown(87)) {
-            let pX = this.x +this.dx * this.speed ; 
-            let pY = this.y + this.dy* this.speed; 
+            let pX = this.x +this.dx * this.speed * (deltaTime/50); 
+            let pY = this.y + this.dy* this.speed * (deltaTime/50); 
             let xo,yo;
             if (this.dx < 0) {xo = -20} else {xo=20};
             if (this.dy < 0) {yo = -20} else {yo=20};
@@ -251,8 +251,8 @@ class Player {
         }
 
         if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) {
-            let pX = this.x -this.dx * this.speed ; 
-            let pY = this.y - this.dy* this.speed; 
+            let pX = this.x -this.dx * this.speed  * (deltaTime/50); 
+            let pY = this.y - this.dy* this.speed * (deltaTime/50); 
             let xo,yo;
             if (this.dx < 0) {xo = 20} else {xo=-20};
             if (this.dy < 0) {yo = 20} else {yo=-20};
@@ -299,7 +299,7 @@ class Player {
             if(keyIsDown(LEFT_ARROW))
             {
                 //turned left
-                this.angle -= 0.1 * this.rotSpeed *  20;
+                this.angle -= 0.1 * this.rotSpeed *  20*shiftSp;
                 if(this.angle<0)
                 {
                     this.angle+= this.tPi;
@@ -309,7 +309,7 @@ class Player {
             }
             if(keyIsDown(RIGHT_ARROW))
             {
-                this.angle += 0.1 * this.rotSpeed *20;
+                this.angle += 0.1 * this.rotSpeed *20*shiftSp;
                 if(this.angle>this.tPi)
                 {
                     this.angle -= this.tPi;
