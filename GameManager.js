@@ -104,6 +104,9 @@ let healthAddOn = 0;
 let chunkX = 0;
 let chunkY = 0;
 
+
+let durationTimer = 0;
+
 //zero represents empty spaces, 1 represeants a square.
 var mapLayout = [
     1, 1, 1, 1, 1, 1, 1, 1,1,1,1, 1, 1, 1, 1, 1, 1, 1,1,1,
@@ -149,6 +152,7 @@ function setup()
     homepageButton = createButton('HomePage')
     homepageButton.position(50,windowH-20);
     homepageButton.mousePressed(HomePageMove)
+    homepageButton.class("myButton")
     pi = PI;
     DR = 0.0174533
     angleMode(RADIANS);
@@ -224,8 +228,9 @@ function UpgradeHealth()
     Score -= HealthCost;
     healthAddOn+=1;
     HealthCost += healthAddOn*5
-    player.curHealth += 20;
-    PlayerHealth += 5
+    player.curHealth += 20*(healthAddOn/2);
+    PlayerHealth += 5*(healthAddOn/2);
+    if(PlayerHealth<player.curHealth) player.curHealth = PlayerHealth;
     UpgradeCost2.innerHTML = `Cost: ${HealthCost} points`
     UpgradeBut2.innerHTML = `Upgrade Health Lv.${healthAddOn+1}`
 }
@@ -234,7 +239,7 @@ function WaveManager()
     Wave += 1;
     curTimerWave = 0; 
     timing = true; 
-    if(timerDeltaWave <= 600)
+    if(timerDeltaWave/20 <= 60)
     {
         Score+= 10;
     }
@@ -250,10 +255,10 @@ function EnemyManager()
     if(health > 100 ) health = 100; 
     for(let i = 0; i < amountOfEnemies; i++)
     {
-        AddEnemy(random(96,1152),1152,20,1,1,10,health)
+        let _speed =  1+((Wave-1)/8) 
+        AddEnemy(random(96,1152),1152,20,_speed,1,10,health)
     }
 }
-
 function draw() 
 {
     fps = frameRate();
@@ -264,7 +269,7 @@ function draw()
         mouseXMove = 0;
     }
     called = false;
-    fill(color(130,233,255))
+    fill(color(255,255,255))
     rect(0,0,windowW,windowH/2)
     fill(color(88,88,88))
     rect(0,windowH/2,windowW,windowH/2)
@@ -273,7 +278,7 @@ function draw()
     drawRays3D()
     document.getElementById("coords").innerHTML = `Coords:(${floor(player.x)},${floor(player.y)}) Tile:(${floor(player.x/64)+1},${floor(player.y/64)+1})`
     document.getElementById("debug").innerHTML = `FPS:${floor(fps)}`
-    document.getElementById("debug1").innerHTML = `Wave Duration Timer:${floor(timerDeltaWave)}`
+    document.getElementById("debug1").innerHTML = `Wave Duration Timer:${floor(timerDeltaWave/20)}`
     // for(let enemy in EnemyCollection)
     // {
     //     enemy.Render();
@@ -327,7 +332,7 @@ function draw()
     else 
     {
         waveAn = `Wave ${Wave}`
-        timerDeltaWave += timerDelta
+        if(locked)timerDeltaWave += deltaTime/60
     }
 
     //player.ShootLogic();
@@ -340,13 +345,16 @@ function draw()
     text(waveAn, windowW-windowW*0.005,windowW*0.03)
     textFont(ZenFont);
     textAlign(LEFT);
-    text(`Gun Damage Upgrade: Lv.${damageAddOn+1}\nFire Rate Upgrade: Lv.${rateOfFireAddOn+1}\nHealth Upgrade: Lv.${healthAddOn+1}`,mapX*8+10,50)
+    text(`Gun Damage Upgrade: Lv.${damageAddOn+1} Damage: ${player.gunDamage + damageAddOn} HP\nFire Rate Upgrade: Lv.${rateOfFireAddOn+1}\nHealth Upgrade: Lv.${healthAddOn+1}`,mapX*8+10,50)
     
     fill(color("yellow"))
     rect(windowW/2-5,windowH/2-5, 10,10)//mini crosshair
     
     if(!locked) return;
-    if(timing){timerDelta += deltaTime/60 }
+    if(timing)
+    {
+        timerDelta += deltaTime/60
+    }
     //console.log(timerDelta);
     if(timerDelta>= 20 && timing)
     {
@@ -518,7 +526,9 @@ function drawMap2D(enemiesKeys)
     stroke(5)
     fill(color("black"))
     line(player.x/8,player.y/8, (player.x + player.dx*8)/8, (player.y + player.dy*8)/8)
-    
+    textSize(5);
+    text("You",player.x/8 - 6,player.y/8 - 8)
+    textSize(10);
     // for(let i = 0; i < EnemyCollection.length; i++)
     // {
     //     ellipse(EnemyCollection[i].x/8,EnemyCollection[i].y/8,4,4)

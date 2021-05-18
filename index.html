@@ -3,12 +3,15 @@
         <title>Hue Gunner</title>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="style.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200&display=swap" rel="stylesheet"> 
     </head>
     <body id="Scroll">
-        
+    <div id="nonP5">
         <div id="title">Hue Gunner</div>
-        <div id="subtitle">Made by: Jaxon Poentis v.10</div>
-        <button id="buttonPlay" onclick="GameStart()">Play!</button>
+        <div id="subtitle">Made by: Jaxon Poentis v.11</div>
+        <button id="buttonPlay" class="myButton"onclick="GameStart()">Play!</button>
         <div id="InfoParent">
             <div id="infoBlock">
                 <div id="infoTitle">How to Play</div>
@@ -33,11 +36,75 @@
                 <!-- This game is a raycast Shooter game. This simply means it's a 3D shooter that isn't really 3D. How it works will be described farther down. -->
             </div>
         </div>
+        </div>
+<!--         
+        <div id="backgroundHome"></div>  -->
         <script>
             function GameStart()
             {
                 location.href = "Game.html"
             }
+            var pI = 3.1415927;
+            class ColorDot
+            {
+                constructor(x,y,ang)
+                {
+                    this.counter = 0;
+                    this.x = x;
+                    this.y = y;
+                    this.ang = ang;
+                    this.dx;
+                    this.dy;
+                    this.setDelta();
+                }
+
+                setDelta()
+                {
+                    this.dx = cos(this.ang)*4;
+                    this.dy = sin(this.ang)*4;
+                }
+                
+                move()
+                {
+                    this.x += this.dx;
+                    this.y += this.dy;
+                    if(this.x <0 || this.x > window.innerWidth || this.y < 0 || this.y > window.innerHeight)
+                    {
+                        this.x = random(0,window.innerWidth);
+                        this.y = random(0,window.innerHeight);
+                        this.ang = random(0,2*pI);
+                        this.setDelta();
+                    }
+                    this.render()
+                    
+                }
+                render()
+                {
+                    if(this.counter>5000){ clear();this.counter = 0}
+                    fill(color("red"))
+                    rect(this.x,this.y,4,4);
+                    this.counter++;
+
+                }
+            }
+            var particle; 
+            function setup()
+            {
+                frameRate(60);
+                let cnv = createCanvas(window.innerWidth, window.innerHeight);
+                cnv.id("homePageCanvas");
+                noStroke()
+                particle = new ColorDot(random(0,window.innerWidth),random(0,window.innerHeight),random(0,2*pI))
+            }
+            function draw()
+            {
+                console.log("??")
+                particle.move();
+                
+                particle.move();
+            }
+
+            
         </script>
     </body>
     

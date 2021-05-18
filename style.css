@@ -23,8 +23,11 @@ body
 
 #title
 {
+    background-color:rgb(86, 195, 236);
+    padding:10px;
+    font-family: 'Oswald', sans-serif;
     position: absolute;
-    top:200px;
+    top:10%;
     left: 50%;
     transform: translate(-50%,-50%);
     font-size: 50px;
@@ -32,8 +35,12 @@ body
 
 #subtitle
 {
+    
+    background-color:rgb(86, 195, 236);
+    padding:10px;
+    font-family: 'Oswald', sans-serif;
     position: absolute;
-    top:250px;
+    top:20%;
     left: 50%;
     transform: translate(-50%,-50%);
 }
@@ -41,20 +48,50 @@ body
 #buttonPlay
 {
     position: absolute;
-    top: 350px;
+    top: 30%;
     left: 50%;
     transform: translate(-50%,-50%); 
     font-size: 25px; 
 }
+.myButton {
+	box-shadow: 0px 10px 14px -7px #276873;
+	background:linear-gradient(to bottom, #599bb3 5%, #408c99 100%);
+	background-color:#599bb3;
+	border-radius:8px;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:20px;
+	font-weight:bold;
+	padding:13px 32px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #3d768a;
+}
+.myButton:hover {
+	background:linear-gradient(to bottom, #408c99 5%, #599bb3 100%);
+	background-color:#408c99;
+}
+.myButton:active {
+	position:relative;
+	top:1px;
+}
+
+        
 #InfoParent
 {
+    
+    font-family: 'Oswald', sans-serif;
+    background-color:rgb(86, 195, 236);
     position: absolute;
-    top:600px;
+    top:calc(40% + 200px);
     left: 50%;
     transform: translate(-50%,-50%);  
+    padding:10px;
 }
 #infoTitle
 {
+    
     font-size: 30px
 }
 #UpgradeMenu
@@ -121,5 +158,25 @@ body
 
 #Scroll
 {
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y:auto;
+}
+
+#nonP5
+{
+    background-color: green;
+    z-index:5
+}
+
+#backgroundHome
+{
+    
+    position: absolute;
+    height:100%;
+    width:70%;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%,-50%); 
+    z-index:2;
+    background-color: aqua;
 }
