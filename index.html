@@ -5,20 +5,22 @@
         <link rel="stylesheet" href="./style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
         <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200&display=swap" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@200;500&family=Press+Start+2P&display=swap" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@200;500&display=swap" rel="stylesheet"> 
+
     </head>
     <body id="Scroll">
     <div id="nonP5">
-        <div id="title">Hue Gunner</div>
+        <div id="title">Hue_Gunner</div>
         <div id="subtitle">Made by: Jaxon Poentis v.11</div>
-        <button id="buttonPlay" class="myButton"onclick="GameStart()">Play!</button>
+        <button id="buttonPlay" class="myButton"onclick="GameStart()">Play</button>
         <div id="InfoParent">
             <div id="infoBlock">
                 <div id="infoTitle">How to Play</div>
                 <div id="description">
-                    <p>To move use the key combination WASD, W - Forward, A - Left, S - Back, D - Right. Use the "Shift" key to sprint which increases your speed with no downsides yet. The "number 1" key is to pause and unpause the game. To move the camera use the mouse or the left and right arrow keys. To shoot use the left mouse button or click space. Use the "e" key to interact with objects such as the upgrade center. </p>
+                    <p>Use the key combination WASD to move, W - Forward, A - Left, S - Back, D - Right. The "Shift" key allows player to boost speed with no drawbacks. The game can be paused and resumed with the "number 1" key. Move the camera with the mouse or the left/right arrow keys. To shoot, hold down the left mouse or press the space bar. To interact with objects, press the "e" key. </p>
                     <span></span>   
-                    <p>The goal of the game is too simply kill the most bad guys (the black squares) you can and to get powerups to make the expeierence easier using the points as currency. Score is also determined by how short the wave lasts incentivising the player to not take so long.</p>    
+                    <p>The objective of the game is to kill as many evil guys (black squares) as possible while collecting powerups to add on to the experience. The length of the wave also affects the score, incentivizing the player to not take too long.</p>    
                 </div>
                 
                 <!-- This game is a raycast Shooter game. This simply means it's a 3D shooter that isn't really 3D. How it works will be described farther down. -->
@@ -26,11 +28,11 @@
             <div id="infoBlock">
                 <div id="infoTitle">Some Facts</div>
                 <div id="description">
-                    <p>The enemy spawns in the tan area of the map. The enemies AI is designed as if they see you, get hit by you, or they hear you shoot a gun within a radius then they will begin to chase you. Chasing stops once they lose sight of you. While the enemies do not see you they wander randomly and change direction whenever they hit a wall. </p>
+                    <p>The opponent spawns in the map's tan region. If the opponent notices you within a certain radius, they will start chasing you. When they lose sight of you, the chasing stops. While the enemy are unaware of your presence, they roam aimlessly and shift direction whenever they come upon a wall.</p>
                     <span></span>   
-                    <p>The minimap in the top left can help you visually the game area so you don't get lost. It's a great tool for enemies sneaking up on you. The player is a blue circle and the enemies are black squares. The lines that extrude out of the shapes are the directions they are facing. Use this to check if an enemy can see you or not.</p> 
+                    <p>The top-left minimap can help in visualizing the game zone so you don't get lost. It’s also a helpful weapon for sneaking up on the enemy. Enemies are represented by black squares, and the player is a blue circle. The lines that extrude out of the shapes are the directions they are facing. Use this to check if an enemy can see you or not.</p> 
                     <span></span>   
-                    <p>You can buy upgrades using points at the upgrade center. It is found at the green square and can be interacted with using e. The shape will turn yellow if you are in range to use the upgrade center. While in the upgrade center click the respective buttons to buy upgrades that can make the game easier/playable later on. The game will automatically pause during this and make sure to manage your points wisely!</p>    
+                    <p>The upgrade center is shown as a green square. When in range of use; it turns yellow, push the “e” key to discover the upgrade center. Upgrades can be purchased here with points, in order to enhance game experience. During this time, the game will automatically pause, so make sure to manage your points wisely!"</p>    
                 </div>
                 
                 <!-- This game is a raycast Shooter game. This simply means it's a 3D shooter that isn't really 3D. How it works will be described farther down. -->
